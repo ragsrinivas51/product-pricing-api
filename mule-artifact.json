@@ -1,7 +1,10 @@
 {
-  "minMuleVersion": "4.9.14",
-  "secureProperties":  ["salesforce.clientId", "salesforce.clientSecret","anypoint.platform.client_id","anypoint.platform.client_secret"],
-  "javaSpecificationVersions": [
-    "17"
-  ]
+    "minMuleVersion": "4.9.14",
+    "javaSpecificationVersions": ["17"],
+    "secureProperties": [
+        "salesforce.clientId",
+        "salesforce.clientSecret",
+        "anypoint.platform.client_id",
+        "anypoint.platform.client_secret"
+    ]
 }
