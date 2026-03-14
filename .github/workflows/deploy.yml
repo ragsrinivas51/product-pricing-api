@@ -6,11 +6,11 @@ on:
       branch:
         description: 'Branch to deploy'
         required: true
-        default: 'dev'
+        default: 'Dev'
         type: choice
         options:
-          - dev
-          - uat
+          - Dev
+          - UAT
           - main
       environment:
         description: 'Target CloudHub 2.0 Environment'
