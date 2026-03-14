@@ -6,10 +6,10 @@ on:
       branch:
         description: 'Branch to deploy'
         required: true
-        default: 'dev'
+        default: 'Dev'
         type: choice
         options:
-          - dev
+          - Dev
           - uat
           - main
       environment:
