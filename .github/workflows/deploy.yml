@@ -1,0 +1,161 @@
+name: Deploy to CloudHub 2.0
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - uat
+          - main
+      environment:
+        description: 'Target CloudHub 2.0 Environment'
+        required: true
+        default: 'Dev'
+        type: choice
+        options:
+          - Dev
+          - UAT
+          - Production
+
+jobs:
+  deploy:
+    name: Deploy to CloudHub 2.0 - ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ── 1. Checkout selected branch ──
+      - name: Checkout Repository (${{ github.event.inputs.branch }})
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      # ── 2. Set up Java 17 ──
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      # ── 3. Set up Maven 4.5.3 ──
+      - name: Set up Maven 4.5.3
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 4.5.3
+
+      # ── 4. Cache Maven dependencies ──
+      - name: Cache Maven Local Repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # ── 5. Locate and configure settings.xml ──
+      #       Writes credentials into ~/.m2/settings.xml on the runner
+      - name: Configure Maven settings.xml
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                                        https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+            <servers>
+
+              <!-- Anypoint Exchange v3 -->
+              <server>
+                <id>anypoint-exchange-v3</id>
+                <username>~~~Client~~~</username>
+                <password>${{ secrets.ANYPOINT_USERNAME }}~?~${{ secrets.ANYPOINT_PASSWORD }}</password>
+              </server>
+
+              <!-- MuleSoft Releases -->
+              <server>
+                <id>mulesoft-releases</id>
+                <username>~~~Client~~~</username>
+                <password>${{ secrets.ANYPOINT_USERNAME }}~?~${{ secrets.ANYPOINT_PASSWORD }}</password>
+              </server>
+
+              <!-- Maven Central -->
+              <server>
+                <id>Repository</id>
+                <username>~~~Client~~~</username>
+                <password>${{ secrets.ANYPOINT_USERNAME }}~?~${{ secrets.ANYPOINT_PASSWORD }}</password>
+              </server>
+
+            </servers>
+
+            <mirrors>
+              <!-- Block HTTP repositories - force HTTPS only -->
+              <mirror>
+                <id>block-http</id>
+                <mirrorOf>external:http:*</mirrorOf>
+                <url>https://repo1.maven.org/maven2</url>
+                <blocked>true</blocked>
+              </mirror>
+            </mirrors>
+
+          </settings>
+          EOF
+          echo "settings.xml written to ~/.m2/settings.xml"
+
+      # ── 6. Verify settings.xml location ──
+      - name: Verify settings.xml
+        run: |
+          echo "settings.xml location:"
+          ls -la ~/.m2/settings.xml
+          echo "settings.xml content (passwords masked):"
+          cat ~/.m2/settings.xml | sed 's/<password>.*<\/password>/<password>****<\/password>/g'
+
+      # ── 7. Build with Maven ──
+      - name: Build with Maven
+        run: mvn clean package -B -s ~/.m2/settings.xml
+
+      # ── 8. Deploy to CloudHub 2.0 ──
+      - name: Deploy to CloudHub 2.0 (${{ github.event.inputs.environment }})
+        run: |
+          mvn deploy -DmuleDeploy -B \
+            -s ~/.m2/settings.xml \
+            -DconnectedAppClientId=${{ secrets.ANYPOINT_USERNAME }} \
+            -DconnectedAppClientSecret=${{ secrets.ANYPOINT_PASSWORD }} \
+            -Danypoint.platform.client_id=${{ secrets.ANYPOINT_CLIENT_ID }} \
+            -Danypoint.platform.client_secret=${{ secrets.ANYPOINT_CLIENT_SECRET }} \
+            -Dsalesforce.clientId=${{ secrets.SALESFORCE_CLIENTID }} \
+            -Dsalesforce.clientSecret=${{ secrets.SALESFORCE_CLIENTSECRET }} \
+            -Dcloudhub2.environment=${{ github.event.inputs.environment }} \
+            -Denv=${{ github.event.inputs.environment }}
+
+      # ── 9. Print deployment summary ──
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "-----------------------------------------"
+          echo "DEPLOYMENT SUCCESSFUL"
+          echo "-----------------------------------------"
+          echo "  Application : product-pricing-api-v1"
+          echo "  Branch      : ${{ github.event.inputs.branch }}"
+          echo "  Environment : ${{ github.event.inputs.environment }}"
+          echo "  Triggered by: ${{ github.actor }}"
+          echo "  Run ID      : ${{ github.run_id }}"
+          echo "-----------------------------------------"
+
+      - name: Deployment Failed
+        if: failure()
+        run: |
+          echo "-----------------------------------------"
+          echo "DEPLOYMENT FAILED"
+          echo "-----------------------------------------"
+          echo "  Branch      : ${{ github.event.inputs.branch }}"
+          echo "  Environment : ${{ github.event.inputs.environment }}"
+          echo "  Triggered by: ${{ github.actor }}"
+          echo "  Check logs above for error details."
+          echo "-----------------------------------------"

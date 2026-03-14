@@ -37,9 +37,11 @@
 				<configuration>
 					<cloudhub2Deployment>
 						<uri>https://anypoint.mulesoft.com</uri>
-						<username>${anypoint.username}</username>
-						<password>${anypoint.password}</password>
+						<connectedAppGrantType>client_credentials</connectedAppGrantType>
+						<connectedAppClientId>${connectedAppClientId}</connectedAppClientId>
+						<connectedAppClientSecret>${connectedAppClientSecret}</connectedAppClientSecret>
 						<businessGroupId>${anypoint.org.id}</businessGroupId>
+						<skipDeploymentVerification>true</skipDeploymentVerification>
 						<environment>${cloudhub2.environment}</environment>
 						<target>${cloudhub2.target}</target>
 						<muleVersion>${mule.runtime.version}</muleVersion>
@@ -60,7 +62,6 @@
 							<salesforce.clientSecret>${salesforce.clientSecret}</salesforce.clientSecret>
 						</secureProperties>
 					</cloudhub2Deployment>
-					<classifier>---- select project type ----</classifier>
 				</configuration>
 			</plugin>
 		</plugins>
