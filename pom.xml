@@ -4,17 +4,22 @@
 
 	<groupId>ae33d189-b1a6-478e-8a64-6a158275d6b7</groupId>
 	<artifactId>product-pricing-api-v1</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.6</version>
 	<packaging>mule-application</packaging>
 
-	<name>product-pricing-api-v1-1.0.4-mule-application</name>
+	<name>product-pricing-api-v1</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-		<app.runtime>4.10.0</app.runtime>
+		<mule.runtime.version>4.11.0</mule.runtime.version>
 		<mule.maven.plugin.version>4.7.0</mule.maven.plugin.version>
+		<cloudhub2.environment>Dev</cloudhub2.environment>
+		<cloudhub2.region>us-east-2</cloudhub2.region>
+		<cloudhub2.target>Cloudhub-US-East-2</cloudhub2.target>
+		<cloudhub2.replicas>1</cloudhub2.replicas>
+		<cloudhub2.vcores>0.1</cloudhub2.vcores>
+		<anypoint.org.id>ae33d189-b1a6-478e-8a64-6a158275d6b7</anypoint.org.id>
 	</properties>
 
 	<build>
@@ -30,26 +35,32 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-					<cloudHubDeployment>
+					<cloudhub2Deployment>
 						<uri>https://anypoint.mulesoft.com</uri>
-						<muleVersion>4.10.0</muleVersion>
-						<applicationName>product-pricing-api-v1</applicationName>
-						<environment>Dev</environment>
-						<businessGroup>PPI</businessGroup>
-						<region>us-east-1</region>
-						<workerType>Micro</workerType>
-						<workers>1</workers>
-						<objectStoreV2>true</objectStoreV2>
-						<connectedAppGrantType>client_credentials</connectedAppGrantType>
-						<connectedAppClientId>334e6c1a0d0c42fe88122b9d2e6b4bda</connectedAppClientId>
-						<connectedAppClientSecret>E04B21984442499B87bdFb90B413ea4A</connectedAppClientSecret>
+						<username>${anypoint.username}</username>
+						<password>${anypoint.password}</password>
+						<businessGroupId>${anypoint.org.id}</businessGroupId>
+						<environment>${cloudhub2.environment}</environment>
+						<target>${cloudhub2.target}</target>
+						<muleVersion>${mule.runtime.version}</muleVersion>
+						<applicationName>${project.artifactId}</applicationName>
+						<replicas>${cloudhub2.replicas}</replicas>
+						<vCores>${cloudhub2.vcores}</vCores>
+						<deploymentSettings>
+							<updateStrategy>rolling</updateStrategy>
+						</deploymentSettings>
+						<provider>MC</provider>
 						<properties>
 							<env>dev</env>
-							<anypoint.platform.client_id>45408df5561346e189c070c40e15370e</anypoint.platform.client_id>
-							<anypoint.platform.client_secret>6FF81D5F180D408e836183a5C22AD360</anypoint.platform.client_secret>
 						</properties>
-					</cloudHubDeployment>
-					<classifier>mule-application</classifier>
+						<secureProperties>
+							<anypoint.platform.client_id>${anypoint.platform.client_id}</anypoint.platform.client_id>
+							<anypoint.platform.client_secret>${anypoint.platform.client_secret}</anypoint.platform.client_secret>
+							<salesforce.clientId>${salesforce.clientId}</salesforce.clientId>
+							<salesforce.clientSecret>${salesforce.clientSecret}</salesforce.clientSecret>
+						</secureProperties>
+					</cloudhub2Deployment>
+					<classifier>---- select project type ----</classifier>
 				</configuration>
 			</plugin>
 		</plugins>

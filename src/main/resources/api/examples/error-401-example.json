@@ -1,8 +1,0 @@
-{
-  "correlationId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "timestamp": "2024-06-20T14:45:00Z",
-  "status": 401,
-  "error": "UNAUTHORIZED",
-  "message": "Invalid or missing client credentials",
-  "path": "/v1/products"
-}

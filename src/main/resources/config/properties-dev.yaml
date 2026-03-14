@@ -3,8 +3,6 @@ api:
 
 #Salesforce configuration
 salesforce:
-    clientId: "3MVG9GCMQoQ6rpzS5ecmzrOTsCxKmMTTBjV3Pqbk8g3DMvKE3QOT3B6QaR91CCCW25McbdkfYxAejywgWtRcD"
-    clientSecret: "01C8722B3CE68E0384023C5E0A8652264CDEC1321EC9C785DAB0EED3EF21EC96"
     tokenUrl:  "https://orgfarm-8a5999478e-dev-ed.develop.my.salesforce.com/services/oauth2/token"
     reconnection:
         frequency: "20000"

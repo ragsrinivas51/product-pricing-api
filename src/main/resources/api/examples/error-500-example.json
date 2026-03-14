@@ -1,8 +1,0 @@
-{
-  "correlationId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "timestamp": "2024-06-20T14:45:00Z",
-  "status": 500,
-  "error": "INTERNAL_SERVER_ERROR",
-  "message": "An unexpected error occurred. Please contact support with the correlationId.",
-  "path": "/v1/products"
-}
