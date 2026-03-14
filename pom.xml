@@ -12,8 +12,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<mule.runtime.version>4.11.0</mule.runtime.version>
-		<mule.maven.plugin.version>4.7.0</mule.maven.plugin.version>
+		<mule.runtime.version>4.9.15</mule.runtime.version>
+		<releaseChannel>LTS</releaseChannel>        
+    	<javaVersion>17</javaVersion> 
+		<mule.maven.plugin.version>4.5.3</mule.maven.plugin.version>
 		<cloudhub2.environment>Dev</cloudhub2.environment>
 		<cloudhub2.region>us-east-2</cloudhub2.region>
 		<cloudhub2.target>Cloudhub-US-East-2</cloudhub2.target>
