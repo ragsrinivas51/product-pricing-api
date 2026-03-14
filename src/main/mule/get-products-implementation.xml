@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+		<sub-flow name="get-products-implementationSub_Flow" doc:id="c7b92a57-dfd4-4354-a097-e805f7cc15c0" >
+		<logger level="INFO" doc:name="startLogger" doc:id="3f00368d-72b1-4a49-80f6-ae1d6d48a5bd" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "Start",&#10;	"timeStamp": now()&#10;}]'/>
+		<ee:transform doc:name="currencyCode,limit, offset" doc:id="a11c8862-bb04-4e90-937c-7022182f94ed" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="queryParams" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	offset : attributes.queryParams.offset,
+	limit : attributes.queryParams.limit
+}]]></ee:set-variable>
+				<ee:set-variable variableName="currencyCode" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.queryParams.currencyCode]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="56aab10f-ff06-463d-8315-845a82e555c7" >
+			<route >
+				<salesforce:query doc:name="Get total record Count" doc:id="6d9862f7-8955-4165-bce2-b3bb4be41c78" config-ref="Salesforce_Config" targetValue="#[payload[0].expr0]">
+			<salesforce:salesforce-query><![CDATA[select COUNT(Id) from Product2]]></salesforce:salesforce-query>
+		</salesforce:query>
+			</route>
+			<route >
+				<ee:cache doc:name="Cache" doc:id="ecddade8-26a3-4c46-b112-e3e2d3e84dc1" cachingStrategy-ref="Caching_Strategy">
+					<http:request method="GET" doc:name="Request" doc:id="fb6656b5-3332-412f-a3de-5f46018b72d8" config-ref="HTTP_Request_configuration" path="/exchange" />
+				</ee:cache>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="e222111f-1bbe-4389-a9c1-d0af3b03f0fa" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="exchangeRate" ><![CDATA[%dw 2.0
+output application/json
+---
+payload[1].payload]]></ee:set-variable>
+				<ee:set-variable variableName="totalRecords" ><![CDATA[%dw 2.0
+output application/json
+---
+payload[0].payload[0]."expr0"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="ff6aaaab-e0b2-4b21-af2d-299ea5ec2e25" >
+			<when expression="#[vars.totalRecords &gt; 0]">
+				<salesforce:query doc:name="Query" doc:id="1164e52d-eba8-4feb-ae81-f3e6ac4980a4" config-ref="Salesforce_Config">
+					<salesforce:salesforce-query ><![CDATA[Select Id,Name, Description, ProductId__c, CurrencyCode__c,ProductPrice__c,  ProductCode, CreatedDate, LastModifiedDate from Product2 ORDER BY ProductId__c ASC LIMIT :limit OFFSET :offset]]></salesforce:salesforce-query>
+					<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	offset : vars.queryParams.offset,
+	limit : vars.queryParams.limit
+}]]]></salesforce:parameters>
+				</salesforce:query>
+				<ee:transform doc:name="payload" doc:id="d68a0486-c65e-4752-a26c-da25e39ab420" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var allRates = vars.exchangeRate.rates	++ { (vars.exchangeRate.base) : 1.0 }
+fun exchangeCurrency(fromCurr,toCurr,amount) = ((allRates[toCurr] /allRates[fromCurr])*amount) as String {format : "##.##"} as Number
+---
+payload map {
+      productId: $.ProductId__c,
+      productName: $.Name,
+      productCode: $.ProductCode,
+      description: $.Description,
+      currencyCode: vars.CurrencyCode,
+      productPrice: exchangeCurrency($.CurrencyCode__c,vars.CurrencyCode,$.ProductPrice__c),
+      salesforceId: $.Id,
+      createdDate: $.CreatedDate,
+      lastModifiedDate: $.LastModifiedDate
+    }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="payload" doc:id="3e0a8e58-8c08-4fb8-88d7-736818d45beb" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="responsePayload" doc:id="caf6327a-c93f-4477-a433-4f9bd1e2f746" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"currencyCode" : vars.currencyCode,
+	"products" : payload,
+	 pagination: {
+	    totalRecords: vars.totalRecords,
+	    limit: vars.queryParams.limit,
+	    offset: vars.queryParams.offset,
+	    currentPage: floor(vars.queryParams.offset /vars.queryParams.limit) + 1,
+	    totalPages: ceil(vars.totalRecords /vars.queryParams.limit)
+  }	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="endLogger" doc:id="9d06c879-5aeb-4628-86c5-53acf0caf606" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>
+	</sub-flow>
+</mule>

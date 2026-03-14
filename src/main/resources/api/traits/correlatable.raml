@@ -1,0 +1,30 @@
+#%RAML 1.0 Trait
+usage: Apply to ALL methods that require traceability
+headers:
+  X-Correlation-Id:
+    description: |
+      Unique identifier for tracing the request across all systems.
+      If not provided by the consumer, MuleSoft generates a UUID v4.
+    type: string
+    required: false
+    pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+responses:
+  200:
+    headers:
+      X-Correlation-Id:
+        description: Correlation ID echoed back in the response for tracing
+        type: string
+        example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  201:
+    headers:
+      X-Correlation-Id:
+        description: Correlation ID echoed back in the response for tracing
+        type: string
+        example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  204:
+    headers:
+      X-Correlation-Id:
+        description: Correlation ID echoed back in the response for tracing
+        type: string
+        example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"

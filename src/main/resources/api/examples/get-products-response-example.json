@@ -1,0 +1,34 @@
+{
+  "products": [
+    {
+      "productId": "P00000000001",
+      "productName": "Premium Laptop Pro",
+      "productCode": "XYZ12345",
+      "description": "High-performance laptop for professional use",
+      "currencyCode": "INR",
+      "productPrice": 124500.00,
+      "salesforceId": "01t000000000001AAA",
+      "createdDate": "2024-01-15T10:30:00Z",
+      "lastModifiedDate": "2024-06-20T14:45:00Z"
+    },
+    {
+      "productId": "P00000000002",
+      "productName": "Wireless Mouse Ultra",
+      "productCode": "ABC98765",
+      "description": "Ergonomic wireless mouse with long battery life",
+      "currencyCode": "INR",
+      "productPrice": 4150.50,
+      "salesforceId": "01t000000000002AAA",
+      "createdDate": "2024-02-10T08:00:00Z",
+      "lastModifiedDate": "2024-05-15T12:00:00Z"
+    }
+  ],
+  "pagination": {
+    "totalRecords": 150,
+    "limit": 10,
+    "offset": 0,
+    "currentPage": 1,
+    "totalPages": 15
+  },
+  "currencyCode": "INR"
+}

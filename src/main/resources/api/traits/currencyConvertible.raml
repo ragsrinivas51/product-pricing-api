@@ -1,0 +1,13 @@
+#%RAML 1.0 Trait
+usage: Apply to GET methods that return product prices
+queryParameters:
+  currencyCode:
+    description: |
+      3-letter currency code for price conversion.
+    type: string
+    required: false
+    minLength: 3
+    maxLength: 3
+    pattern: "^[A-Z]{3}$"
+    default: "USD"
+    example: "INR"

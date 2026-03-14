@@ -1,0 +1,18 @@
+{
+  "correlationId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "timestamp": "2024-06-20T14:45:00Z",
+  "status": 400,
+  "error": "BAD_REQUEST",
+  "message": "Request validation failed",
+  "path": "/v1/products",
+  "details": [
+    {
+      "field": "productPrice",
+      "issue": "Value must be greater than 0"
+    },
+    {
+      "field": "productId",
+      "issue": "Must not exceed 12 characters"
+    }
+  ]
+}

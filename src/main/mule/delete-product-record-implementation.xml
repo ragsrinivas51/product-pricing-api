@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="delete-product-record-implementationSub_Flow" doc:id="a4d10762-6d48-4cb0-a230-dc39c41d1076" >
+		<logger level="INFO" doc:name="startLogger" doc:id="d59a406a-7b0d-4042-aa20-54f30307bff5" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "Start",&#10;	"timeStamp": now()&#10;}]'/>
+		<set-variable value="#[attributes.uriParams.'productId']" doc:name="productId" doc:id="6bd49862-3fe8-4317-bff9-febea509fa1c" variableName="productId"/>
+		<salesforce:query doc:name="QueryProduct" doc:id="9a6ecb32-3298-4543-afe8-7510c87efa41" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[select Id from product2 where ProductId__c = ':productId']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	productId : vars.productId
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<choice doc:name="Choice" doc:id="2ac2dccb-9424-4390-a966-b74c42b76d82" >
+			<when expression="#[not isEmpty(payload)]">
+				<salesforce:delete doc:name="Delete" doc:id="1292a423-4e21-4f74-b2d6-227d4057ad97" config-ref="Salesforce_Config">
+					<salesforce:ids ><![CDATA[#[output application/json
+---
+payload.Id]]]></salesforce:ids>
+				</salesforce:delete>
+				<ee:transform doc:name="Transform Message" doc:id="f64bfde5-3128-43b1-8b96-b61e5675e5c3" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="90e9df2a-1cb8-46b8-899a-c4eaf8e32303" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message" : "ProductId: " ++ (vars.productId) ++ " not available"
+}  ]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="endLogger" doc:id="5006a032-5b12-4f8d-84e2-7896706467ed" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>
+	</sub-flow>
+</mule>

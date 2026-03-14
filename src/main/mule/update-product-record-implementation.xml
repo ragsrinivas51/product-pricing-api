@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<sub-flow name="update-product-record-implementationSub_Flow" doc:id="bcacd3bc-158a-4a4a-b2a3-7f1f4f82772b" >
+		<logger level="INFO" doc:name="startLogger" doc:id="4a5e62d7-66b4-45c0-9a55-d1394a0f9fbc" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "Start",&#10;	"timeStamp": now()&#10;}]'/>
+		<set-variable value="#[attributes.uriParams.'productId']" doc:name="Set Variable" doc:id="53c1ae12-6539-4ad5-836a-5aa31d7681b0" variableName="productId"/>
+		<salesforce:query doc:name="Query" doc:id="23093bd9-cc96-4f3b-a41f-9ef83924c0b2" config-ref="Salesforce_Config" target="sfId">
+			<salesforce:salesforce-query ><![CDATA[select Id from product2 where ProductId__c = ':productId']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	productId : vars.productId
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<choice doc:name="Choice" doc:id="9da77864-c088-4010-871f-120e8a631ace" >
+			<when expression="#[not isEmpty(payload)]">
+				<ee:transform doc:name="Transform Message" doc:id="05931f2f-20c9-48c5-aa24-a7632484b92f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{   
+	"Id" : vars.sfId[0].Id,
+    "ProductId__c" : vars.productId,
+    "Name" : payload.productName,
+  //  "ProductCode" : payload.productCode,
+    "Description" : payload.description,
+    "CurrencyCode__c" : payload.currencyCode,
+    "ProductPrice__c" : payload.productPrice as String {format : "0.00"} as Number
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<salesforce:update doc:name="Update" doc:id="50108e69-caa7-4187-98e6-fa1bccfcfdd6" config-ref="Salesforce_Config" type="Product2" target="salesforceResponse">
+			<salesforce:records><![CDATA[#[[payload]]]]></salesforce:records>
+		</salesforce:update>
+				<ee:transform doc:name="Transform Message" doc:id="ab3a6a49-c5a5-4740-be85-93460bd7fa38">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload ++ (if(vars.salesforceResponse."successful")
+	 {
+		id : vars.salesforceResponse.items[0].id,
+		message : "Record Inserted Successfully"
+	}
+else
+	 {
+		id : vars.salesforceResponse.items[0].id,
+		message : vars.salesforceResponse.items[0].message,
+		errors : vars.salesforceResponse.items[0].payload.errors
+	})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="b53ef16b-1315-46da-bf61-aaea8c1cde67" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"Product Id not available to udpate"]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="endLogger" doc:id="e1d2d802-a02b-436d-8e8d-9dee6ef9736d" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>
+		
+	</sub-flow>
+</mule>

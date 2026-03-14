@@ -1,0 +1,14 @@
+{
+  "correlationId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "timestamp": "2024-06-20T14:45:00Z",
+  "status": 409,
+  "error": "CONFLICT",
+  "message": "A product with ProductCode 'XYZ12345' already exists in Salesforce CRM",
+  "path": "/v1/products",
+  "details": [
+    {
+      "field": "productCode",
+      "issue": "ProductCode must be unique. Value 'XYZ12345' is already in use."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<sub-flow name="create-product-implementationSub_Flow" doc:id="5524027d-b875-4727-82fe-c128103886e3" >
+		<logger level="INFO" doc:name="startLogger" doc:id="8079d304-240f-4d79-b3be-4b6fc4d084c5" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "Start",&#10;	"timeStamp": now()&#10;}]'/>
+		<ee:transform doc:name="payload" doc:id="4c8561df-42f6-4cd1-bd74-bcd4f702a8a1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{   
+    "ProductId__c" : payload.productId,
+    "Name" : payload.productName,
+    "ProductCode" : payload.productCode,
+    "Description" : payload.description,
+    "CurrencyCode__c" : payload.currencyCode,
+    "ProductPrice__c" : payload.productPrice as String {format : "0.00"} as Number
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="CreateProduct" doc:id="ae2774d9-097b-49c9-8176-465cf182dad5" config-ref="Salesforce_Config" type="Product2" target="salesforceResponse">
+			<salesforce:records ><![CDATA[#[[payload]]]]></salesforce:records>
+		</salesforce:create>
+		<ee:transform doc:name="responsePayload" doc:id="34b2598e-8396-424a-825c-eec6cf2a5132" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload ++ (if(vars.salesforceResponse."successful")
+	 {
+		id : vars.salesforceResponse.items[0].id,
+		message : "Record Inserted Successfully"
+	}
+else
+	 {
+		id : vars.salesforceResponse.items[0].id,
+		message : vars.salesforceResponse.items[0].message,
+		errors : vars.salesforceResponse.items[0].payload.errors
+	})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="endLogger" doc:id="6c9221ff-2c69-47e9-989f-0997968bc08e" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>
+	</sub-flow>
+</mule>

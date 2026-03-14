@@ -1,0 +1,35 @@
+api:
+    autodiscovery: "20791765"
+
+#Salesforce configuration
+salesforce:
+    clientId: "3MVG9GCMQoQ6rpzS5ecmzrOTsCxKmMTTBjV3Pqbk8g3DMvKE3QOT3B6QaR91CCCW25McbdkfYxAejywgWtRcD"
+    clientSecret: "01C8722B3CE68E0384023C5E0A8652264CDEC1321EC9C785DAB0EED3EF21EC96"
+    tokenUrl:  "https://orgfarm-8a5999478e-dev-ed.develop.my.salesforce.com/services/oauth2/token"
+    reconnection:
+        frequency: "20000"
+        attempts: "2"
+
+#CurrencyAPI configuration details
+http:
+    host: "0.0.0.0"
+    port: "8081"
+    currencyAPI: 
+        host: "currency-exchange-api-v1-esulbe.5sc6y6-3.usa-e2.cloudhub.io"
+        port: "443"
+
+    reconnection:
+        frequency: "20000"
+        attempts: "2"
+
+#Cache Object Store details
+os:
+    max:
+        entries: "5"
+    entry:
+        ttl: "1"
+    expiration:
+        interval: "1"
+        
+
+

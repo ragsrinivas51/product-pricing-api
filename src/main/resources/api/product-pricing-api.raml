@@ -1,0 +1,203 @@
+#%RAML 1.0
+title: product-pricing-api
+
+version: v1
+baseUri: https://{environment}.product-pricing-api.cloudhub.io/{version}
+baseUriParameters:
+  environment:
+    description: Deployment environment
+    enum: [dev, test, uat, prod]
+    default: dev
+protocols: [HTTPS]
+
+
+uses:
+  lib: dataTypes/productDataTypes.raml
+
+resourceTypes: 
+  collection : !include resourceTypes/productResourceTypes.raml 
+
+traits: 
+  pageable: !include traits/pageable.raml  
+  correlatable: !include traits/correlatable.raml 
+  currenyConvertible: !include traits/currencyConvertible.raml
+
+securitySchemes:
+  client_id_enforcement: !include securitySchemes/clientIdEnforcement.raml
+
+
+/products:
+  description: Manages Product resources in Salesforce 
+  get:
+    displayName: Get All Products
+    description: |
+      Retrieves all products from Salesforce CRM (Product2). Supports pagination via limit/offset and optional currency conversion.
+    is: [pageable, correlatable, currenyConvertible]
+    securedBy: [client_id_enforcement]
+    responses:
+      200:
+        description: Successfully retrieved products list
+        headers:
+          X-Correlation-Id:
+            description: Correlation ID for request tracing
+            type: string
+          X-Total-Count:
+            description: Total number of records available
+            type: integer
+        body:
+          application/json:
+            type: lib.ProductListResponse
+            example: !include examples/get-products-response-example.json
+      400:
+        description: Bad Request – invalid query parameters
+        body:
+          application/json:
+            type: lib.ErrorResponse
+            example: !include examples/error-400-example.json
+      401:
+        description: Unauthorized – missing or invalid client credentials
+        body:
+          application/json:
+            type: lib.ErrorResponse
+            example: !include examples/error-401-example.json
+      500:
+        description: Internal Server Error
+        body:
+          application/json:
+            type: lib.ErrorResponse
+            example: !include examples/error-500-example.json
+
+  post:
+    displayName: Create Product
+    description: |
+      Creates a new Product in Salesforce CRM (Product2 Object). ProductCode must be unique.
+    is: [correlatable]
+    securedBy: [client_id_enforcement]
+    body:
+      application/json:
+        type: lib.ProductCreateRequest
+        example: !include examples/create-product-request-example.json
+    responses:
+      201:
+        description: Product created successfully
+        headers:
+          X-Correlation-Id:
+            type: string
+          Location:
+            description: URI of the newly created product
+            type: string
+            example: /v1/products/P00000000001
+        body:
+          application/json:
+            type: lib.ProductResponse
+            example: !include examples/create-product-response-example.json
+      400:
+        description: Bad Request – validation failure
+        body:
+          application/json:
+            type: lib.ErrorResponse
+            example: !include examples/error-400-example.json
+      401:
+        description: Unauthorized
+        body:
+          application/json:
+            type: lib.ErrorResponse
+            example: !include examples/error-401-example.json
+      409:
+        description: Conflict – Product with same ProductCode already exists
+        body:
+          application/json:
+            type: lib.ErrorResponse
+            example: !include examples/error-409-example.json
+      500:
+        description: Internal Server Error
+        body:
+          application/json:
+            type: lib.ErrorResponse
+            example: !include examples/error-500-example.json
+
+  /{productId}:
+    description: Operations on a specific Product identified by productId (ExternalId)
+    uriParameters:
+      productId:
+        description: |
+          Unique external product identifier stored in Salesforce ExternalId field.
+          Must not exceed 12 characters. Example: P00000000001
+        type: string
+        maxLength: 12
+        pattern: "^[A-Z0-9]{1,12}$"
+        example: P00000000001
+    patch:
+      displayName: Update Product
+      description: |
+        Partially updates an existing Product in Salesforce CRM.
+        ProductCode field is NOT allowed to be updated.
+      is: [correlatable]
+      securedBy: [client_id_enforcement]
+      body:
+        application/json:
+          type: lib.ProductUpdateRequest
+          example: !include examples/update-product-request-example.json
+      responses:
+        200:
+          description: Product updated successfully
+          headers:
+            X-Correlation-Id:
+              type: string
+          body:
+            application/json:
+              type: lib.ProductResponse
+              example: !include examples/update-product-response-example.json
+        400:
+          description: Bad Request – validation failure or attempt to update ProductCode
+          body:
+            application/json:
+              type: lib.ErrorResponse
+              example: !include examples/error-400-example.json
+        401:
+          description: Unauthorized
+          body:
+            application/json:
+              type: lib.ErrorResponse
+              example: !include examples/error-401-example.json
+        404:
+          description: Product not found
+          body:
+            application/json:
+              type: lib.ErrorResponse
+              example: !include examples/error-404-example.json
+        500:
+          description: Internal Server Error
+          body:
+            application/json:
+              type: lib.ErrorResponse
+              example: !include examples/error-500-example.json    
+    delete:
+      displayName: Delete Product
+      description: Deletes an existing Product from Salesforce CRM by productId (ExternalId).
+      is: [correlatable]
+      securedBy: [client_id_enforcement]
+      responses:
+        204:
+          description: Product deleted successfully – no content returned
+          headers:
+            X-Correlation-Id:
+              type: string
+        401:
+          description: Unauthorized
+          body:
+            application/json:
+              type: lib.ErrorResponse
+              example: !include examples/error-401-example.json
+        404:
+          description: Product not found
+          body:
+            application/json:
+              type: lib.ErrorResponse
+              example: !include examples/error-404-example.json
+        500:
+          description: Internal Server Error
+          body:
+            application/json:
+              type: lib.ErrorResponse
+              example: !include examples/error-500-example.json

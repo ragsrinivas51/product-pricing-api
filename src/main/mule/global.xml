@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="8e161c2c-6433-472a-9303-69339c85db95" >
+		<salesforce:oauth-client-credentials-connection >
+			<reconnection >
+				<reconnect frequency="${salesforce.reconnection.frequency}" count="${salesforce.reconnection.attempts}"/>
+			</reconnection>
+			<salesforce:oauth-client-credentials clientId="${salesforce.clientId}" clientSecret="${salesforce.clientSecret}" tokenUrl="${salesforce.tokenUrl}" />
+		</salesforce:oauth-client-credentials-connection>
+	</salesforce:sfdc-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="71fba693-8b06-42e7-aa2a-84e0709cfa2d" >
+		<http:request-connection protocol="HTTPS" host="${http.currencyAPI.host}" port="${http.currencyAPI.port}" >
+			<reconnection >
+				<reconnect frequency="${http.reconnection.frequency}" count="${http.reconnection.attempts}" blocking="false"/>
+			</reconnection>
+		</http:request-connection>
+	</http:request-config>
+	 <http:listener-config name="product-pricing-api-httpListenerConfig">
+        <http:listener-connection host="${http.host}" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="product-pricing-api-config" api="product-pricing-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	
+	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="9c090578-69ad-49a9-94c7-c6efdb59d221" keyGenerationExpression="#[now() as Date]" objectStore="Cache_Object_store"/>
+	<os:object-store name="Cache_Object_store" doc:name="Object store" doc:id="4f81c7ff-92e6-470a-9219-adcaf4f43642" maxEntries="${os.max.entries}" entryTtl="${os.entry.ttl}" entryTtlUnit="DAYS" expirationIntervalUnit="HOURS" expirationInterval="${os.expiration.interval}"/>
+	<configuration-properties doc:name="Configuration properties" doc:id="dc72cbb6-6d15-4a2d-ad42-895e36264818" file="config/properties-${env}.yaml" />
+	<api-gateway:autodiscovery apiId="${api.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="dcb6bbf2-f624-4bd2-b70f-8769e6d3d1da" flowRef="product-pricing-api-main" />
+</mule>
