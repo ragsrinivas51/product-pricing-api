@@ -4,7 +4,7 @@
 
 	<groupId>ae33d189-b1a6-478e-8a64-6a158275d6b7</groupId>
 	<artifactId>product-pricing-papi</artifactId>
-	<version>1.0.7</version>
+	<version>1.0.8</version>
 	<packaging>mule-application</packaging>
 
 	<name>product-pricing-papi</name>
@@ -21,7 +21,6 @@
 		<cloudhub2.target>Cloudhub-US-East-2</cloudhub2.target>
 		<cloudhub2.replicas>1</cloudhub2.replicas>
 		<cloudhub2.vcores>0.1</cloudhub2.vcores>
-		<anypoint.org.id>ae33d189-b1a6-478e-8a64-6a158275d6b7</anypoint.org.id>
 	</properties>
 
 	<build>
@@ -42,7 +41,7 @@
 						<connectedAppGrantType>client_credentials</connectedAppGrantType>
 						<connectedAppClientId>${connectedAppClientId}</connectedAppClientId>
 						<connectedAppClientSecret>${connectedAppClientSecret}</connectedAppClientSecret>
-						<businessGroupId>${anypoint.org.id}</businessGroupId>
+						<businessGroupId>${project.groupId}</businessGroupId>
 						<skipDeploymentVerification>true</skipDeploymentVerification>
 						<environment>${cloudhub2.environment}</environment>
 						<target>${cloudhub2.target}</target>
@@ -55,7 +54,7 @@
 						</deploymentSettings>
 						<provider>MC</provider>
 						<properties>
-							<env>dev</env>
+							<env>${env}</env>
 						</properties>
 						<secureProperties>
 							<anypoint.platform.client_id>${anypoint.platform.client_id}</anypoint.platform.client_id>
@@ -95,7 +94,7 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>ae33d189-b1a6-478e-8a64-6a158275d6b7</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>product-pricing-api</artifactId>
 			<version>1.0.1</version>
 			<classifier>raml</classifier>
@@ -113,7 +112,7 @@
 		<repository>
 			<id>anypoint-exchange-v3</id>
 			<name>product-management</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/ae33d189-b1a6-478e-8a64-6a158275d6b7/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/${project.groupId}/maven</url>
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>

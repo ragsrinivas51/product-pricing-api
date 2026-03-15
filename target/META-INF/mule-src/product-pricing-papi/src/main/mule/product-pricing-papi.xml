@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+       <flow name="product-pricing-api-main">
+        <http:listener config-ref="product-pricing-api-httpListenerConfig" path="/api/v1/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="product-pricing-api-config" />
+		<error-handler ref="Global_Error_Handler" />
+    </flow>
+    <flow name="delete:\products\(productId):product-pricing-api-config">
+        <flow-ref doc:name="delete-product-record-implementationSub_Flow" doc:id="42024081-161d-4caa-843a-fc633ae5a354" name="delete-product-record-implementationSub_Flow"/>
+        <error-handler ref="Global_Error_Handler"/>
+    </flow>
+    <flow name="patch:\products\(productId):application\json:product-pricing-api-config">
+		<flow-ref doc:name="update-product-record-implementationSub_Flow" doc:id="1a8ab6f7-e8e3-4ad8-b141-46114d7d911a" name="update-product-record-implementationSub_Flow"/>
+        <error-handler ref="Global_Error_Handler"/>
+    </flow>
+    <flow name="get:\products:product-pricing-api-config">
+        <flow-ref doc:name="Flow Reference" doc:id="59444322-b4b1-4894-9fe5-689968d15640" name="get-products-implementationSub_Flow"/>
+        <error-handler ref="Global_Error_Handler"/>
+    </flow>
+    <flow name="post:\products:application\json:product-pricing-api-config">
+		<flow-ref doc:name="create-product-implementationSub_Flow" doc:id="a27d2c82-5b3d-4a90-89c7-32c97d10f70d" name="create-product-implementationSub_Flow"/>
+        <error-handler ref="Global_Error_Handler"/>
+    </flow>
+</mule>
