@@ -35,8 +35,8 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="9c090578-69ad-49a9-94c7-c6efdb59d221" keyGenerationExpression="#[now() as Date]" objectStore="Cache_Object_store"/>
 	<os:object-store name="Cache_Object_store" doc:name="Object store" doc:id="4f81c7ff-92e6-470a-9219-adcaf4f43642" maxEntries="${os.max.entries}" entryTtl="${os.entry.ttl}" entryTtlUnit="DAYS" expirationIntervalUnit="HOURS" expirationInterval="${os.expiration.interval}"/>
 	<configuration-properties doc:name="Configuration properties" doc:id="dc72cbb6-6d15-4a2d-ad42-895e36264818" file="config/properties-${env}.yaml" />
-<!-- 	<api-gateway:autodiscovery apiId="${api.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="dcb6bbf2-f624-4bd2-b70f-8769e6d3d1da" flowRef="product-pricing-api-main" />
- -->	
+	<api-gateway:autodiscovery apiId="${api.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="dcb6bbf2-f624-4bd2-b70f-8769e6d3d1da" flowRef="product-pricing-api-main" />
+	
 	<error-handler name="Global_Error_Handler" doc:id="a835458d-da8c-4204-84ac-51abd86c5ffc">
 		
 		
