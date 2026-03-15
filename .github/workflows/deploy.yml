@@ -123,6 +123,8 @@ jobs:
       # ── 8. Deploy to CloudHub 2.0 ──
       - name: Deploy to CloudHub 2.0 (${{ github.event.inputs.environment }})
         run: |
+          ENV=$(echo "${{ github.event.inputs.environment }}" | tr '[:upper:]' '[:lower:]')
+          echo "ENV value is: $ENV"
           mvn deploy -DmuleDeploy -B \
             -s ~/.m2/settings.xml \
             -DconnectedAppClientId=${{ secrets.ANYPOINT_USERNAME }} \
@@ -132,7 +134,7 @@ jobs:
             -Dsalesforce.clientId=${{ secrets.SALESFORCE_CLIENTID }} \
             -Dsalesforce.clientSecret=${{ secrets.SALESFORCE_CLIENTSECRET }} \
             -Dcloudhub2.environment=${{ github.event.inputs.environment }} \
-            -Denv=${{ github.event.inputs.environment }}
+            -Denv=$ENV
 
       # ── 9. Print deployment summary ──
       - name: Deployment Summary
