@@ -4,7 +4,7 @@
 
 	<groupId>ae33d189-b1a6-478e-8a64-6a158275d6b7</groupId>
 	<artifactId>product-pricing-papi</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<packaging>mule-application</packaging>
 
 	<name>product-pricing-papi</name>

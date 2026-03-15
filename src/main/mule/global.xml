@@ -35,8 +35,8 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="9c090578-69ad-49a9-94c7-c6efdb59d221" keyGenerationExpression="#[now() as Date]" objectStore="Cache_Object_store"/>
 	<os:object-store name="Cache_Object_store" doc:name="Object store" doc:id="4f81c7ff-92e6-470a-9219-adcaf4f43642" maxEntries="${os.max.entries}" entryTtl="${os.entry.ttl}" entryTtlUnit="DAYS" expirationIntervalUnit="HOURS" expirationInterval="${os.expiration.interval}"/>
 	<configuration-properties doc:name="Configuration properties" doc:id="dc72cbb6-6d15-4a2d-ad42-895e36264818" file="config/properties-${env}.yaml" />
-	<api-gateway:autodiscovery apiId="${api.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="dcb6bbf2-f624-4bd2-b70f-8769e6d3d1da" flowRef="product-pricing-api-main" />
-	
+<!-- 	<api-gateway:autodiscovery apiId="${api.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="dcb6bbf2-f624-4bd2-b70f-8769e6d3d1da" flowRef="product-pricing-api-main" />
+ -->	
 	<error-handler name="Global_Error_Handler" doc:id="a835458d-da8c-4204-84ac-51abd86c5ffc">
 		
 		
@@ -221,6 +221,25 @@ var mapped     = errorRegistry[identifier]
 			</ee:transform>
 			<logger level="ERROR" doc:name="Log Operation Error" message="#[output application/json &#10;---&#10;payload]" />
 			<set-variable value="#[500]" doc:name="Set Variable" doc:id="927aa122-5f73-4a6a-9ed6-e22a8fef5bfe" variableName="httpStatus"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8f593356-ef18-4202-80a6-6a714624b60e" type="SF:RECORD_NOT_FOUD">
+			<ee:transform doc:name="Transform Message" doc:id="5656a843-16cd-49ce-8a7e-de22c2c9a8cd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "statusCode": 500,
+  "message": "ProductId: " ++ (vars.productId) ++ " is not available",
+  "errorCode": "RECORD_NOT_FOUND",
+  "timestamp": now(),
+  "transactionId": correlationId,
+  "details": "ProductId: " ++ (vars.productId) ++ " is not available"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="66c36ba7-27bb-414e-9870-f9b9c1483e41" />
+			<set-variable value="#[500]" doc:name="Set Variable" doc:id="81c6b040-83f9-4b7a-a36f-0b4d94fd5b72" variableName="httpStatus"/>
 		</on-error-propagate>
 	</error-handler>
 </mule>

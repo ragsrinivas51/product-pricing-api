@@ -43,6 +43,7 @@ output application/json
 }  ]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
+				<raise-error doc:name="Raise error" doc:id="a32dcd7f-b8e1-43c7-a7ef-6df1bc5653ca" type="SF:RECORD_NOT_FOUD" description="ProductID is not valid"/>
 			</otherwise>
 		</choice>
 		<logger level="INFO" doc:name="endLogger" doc:id="5006a032-5b12-4f8d-84e2-7896706467ed" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>

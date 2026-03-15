@@ -18,7 +18,7 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 }]]]></salesforce:parameters>
 		</salesforce:query>
 		<choice doc:name="Choice" doc:id="9da77864-c088-4010-871f-120e8a631ace" >
-			<when expression="#[not isEmpty(payload)]">
+			<when expression="#[not isEmpty(vars.sfId)]">
 				<ee:transform doc:name="Transform Message" doc:id="05931f2f-20c9-48c5-aa24-a7632484b92f">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
@@ -66,6 +66,7 @@ output application/json
 "Product Id not available to udpate"]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
+				<raise-error doc:name="Raise error" doc:id="b56e347e-4a3b-472f-9e7f-a0c07ecd45dd" type="SF:RECORD_NOT_FOUD" description="Product Id not available to udpate"/>
 			</otherwise>
 		</choice>
 		<logger level="INFO" doc:name="endLogger" doc:id="e1d2d802-a02b-436d-8e8d-9dee6ef9736d" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>
