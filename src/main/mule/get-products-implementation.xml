@@ -32,12 +32,12 @@ attributes.queryParams.currencyCode]]></ee:set-variable>
 		</salesforce:query>
 			</route>
 			<route >
-				<ee:cache doc:name="Cache" doc:id="ecddade8-26a3-4c46-b112-e3e2d3e84dc1" cachingStrategy-ref="Caching_Strategy">
-					<http:request method="GET" doc:name="Request" doc:id="fb6656b5-3332-412f-a3de-5f46018b72d8" config-ref="HTTP_Request_configuration" path="/exchange" />
+				<ee:cache doc:name="currencyExchangeRateCache" doc:id="ecddade8-26a3-4c46-b112-e3e2d3e84dc1" cachingStrategy-ref="Caching_Strategy">
+					<http:request method="GET" doc:name="Call currencyConversionAPI" doc:id="fb6656b5-3332-412f-a3de-5f46018b72d8" config-ref="HTTP_Request_configuration" path="/exchange" />
 				</ee:cache>
 			</route>
 		</scatter-gather>
-		<ee:transform doc:name="Transform Message" doc:id="e222111f-1bbe-4389-a9c1-d0af3b03f0fa" >
+		<ee:transform doc:name="totalRecords,exchangeRates" doc:id="e222111f-1bbe-4389-a9c1-d0af3b03f0fa" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
@@ -53,7 +53,7 @@ payload[0].payload[0]."expr0"]]></ee:set-variable>
 		</ee:transform>
 		<choice doc:name="Choice" doc:id="ff6aaaab-e0b2-4b21-af2d-299ea5ec2e25" >
 			<when expression="#[vars.totalRecords &gt; 0]">
-				<salesforce:query doc:name="Query" doc:id="1164e52d-eba8-4feb-ae81-f3e6ac4980a4" config-ref="Salesforce_Config">
+				<salesforce:query doc:name="queryProductObject" doc:id="1164e52d-eba8-4feb-ae81-f3e6ac4980a4" config-ref="Salesforce_Config">
 					<salesforce:salesforce-query ><![CDATA[Select Id,Name, Description, ProductId__c, CurrencyCode__c,ProductPrice__c,  ProductCode, CreatedDate, LastModifiedDate from Product2 ORDER BY ProductId__c ASC LIMIT :limit OFFSET :offset]]></salesforce:salesforce-query>
 					<salesforce:parameters ><![CDATA[#[output application/java
 ---
@@ -84,7 +84,7 @@ payload map {
 				</ee:transform>
 			</when>
 			<otherwise >
-				<ee:transform doc:name="payload" doc:id="3e0a8e58-8c08-4fb8-88d7-736818d45beb" >
+				<ee:transform doc:name="emptyPayload" doc:id="3e0a8e58-8c08-4fb8-88d7-736818d45beb" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/java

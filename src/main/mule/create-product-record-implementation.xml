@@ -25,9 +25,11 @@ output application/java
 		<salesforce:create doc:name="CreateProduct" doc:id="ae2774d9-097b-49c9-8176-465cf182dad5" config-ref="Salesforce_Config" type="Product2" target="salesforceResponse">
 			<salesforce:records ><![CDATA[#[[payload]]]]></salesforce:records>
 		</salesforce:create>
-		<ee:transform doc:name="responsePayload" doc:id="34b2598e-8396-424a-825c-eec6cf2a5132" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+		<choice doc:name="" doc:id="0b7b5e0b-88d2-4601-b9b4-5a7c1c59912f" >
+			<when expression="#[isEmpty(vars.salesforceResponse.items[0].statusCode)]">
+				<ee:transform doc:name="responsePayload" doc:id="34b2598e-8396-424a-825c-eec6cf2a5132">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload ++ (if(vars.salesforceResponse."successful")
@@ -43,6 +45,23 @@ else
 	})]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="errorPayload" doc:id="d22eaf7c-3b85-4955-ab7f-8f9fa39535e9" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"message": vars.salesforceResponse.items[0].message,
+  	"errorCode": vars.salesforceResponse.items[0].statusCode ,
+  	"details": vars.salesforceResponse.items[0].message
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<raise-error doc:name="createProductError" doc:id="577e32ed-27b3-4b40-a0b6-0368a9ff52a2" type="SF:CREATE_ERROR"/>
+			</otherwise>
+		</choice>
 		<logger level="INFO" doc:name="endLogger" doc:id="6c9221ff-2c69-47e9-989f-0997968bc08e" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>
 	</sub-flow>
 </mule>

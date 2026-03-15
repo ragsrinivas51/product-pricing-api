@@ -42,7 +42,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 		
 		
 		<on-error-propagate type="EXPRESSION" doc:name="Default Catch-All Error Handler" doc:id="catchall-001" enableNotifications="true" logException="true">
-			<ee:transform doc:name="Transform Generic Error Response" doc:id="catchall-transform-001">
+			<ee:transform doc:name="genericErrorResponse" doc:id="catchall-transform-001">
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -61,11 +61,11 @@ output application/json
 					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-			<logger level="ERROR" doc:name="Log Unhandled Error" message="#[output application/json &#10;---&#10;payload]" />
-			<set-variable value="#[payload.statusCode]" doc:name="Set Variable" doc:id="947ee37c-4313-4d5d-9a58-18142b59571b" variableName="httpStatus"/>
+			<logger level="ERROR" doc:name="logError" message="#[output application/json &#10;---&#10;payload]" />
+			<set-variable value="#[payload.statusCode]" doc:name="httpStatus" doc:id="947ee37c-4313-4d5d-9a58-18142b59571b" variableName="httpStatus"/>
 		</on-error-propagate>
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate - APIKIT Errors" doc:id="9f006e21-baac-4d3d-bf35-67d1abb540f7" type="APIKIT:BAD_REQUEST, APIKIT:NOT_FOUND, APIKIT:METHOD_NOT_ALLOWED, APIKIT:NOT_ACCEPTABLE, APIKIT:UNSUPPORTED_MEDIA_TYPE, APIKIT:NOT_IMPLEMENTED">
-			<ee:transform doc:name="Transform Message" doc:id="5251cbda-5bf3-4985-aced-add118316548">
+			<ee:transform doc:name="apikitErrorResponse" doc:id="5251cbda-5bf3-4985-aced-add118316548">
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -90,11 +90,11 @@ var mapped     = errorRegistry[identifier]
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-			<logger level="INFO" doc:name="Logger" doc:id="b6c8d109-aa54-4c8b-bcff-55579338cb45" message="#[output application/json &#10;---&#10;payload]"/>
-			<set-variable value="#[payload.statusCode]" doc:name="Set Variable" doc:id="99461fbc-93ee-4e96-884f-6d0e0bd2bb31" variableName="httpStatus" />
+			<logger level="INFO" doc:name="logError" doc:id="b6c8d109-aa54-4c8b-bcff-55579338cb45" message="#[output application/json &#10;---&#10;payload]"/>
+			<set-variable value="#[payload.statusCode]" doc:name="httpStatus" doc:id="99461fbc-93ee-4e96-884f-6d0e0bd2bb31" variableName="httpStatus" />
 		</on-error-propagate>
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate - HTTP Request Errors" doc:id="65a39c07-fe1b-4583-bfb7-85bd1d5348cb" type="HTTP:BAD_GATEWAY, HTTP:BAD_REQUEST, HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:INTERNAL_SERVER_ERROR, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_ACCEPTABLE, HTTP:NOT_FOUND, HTTP:PARSING, HTTP:RETRY_EXHAUSTED, HTTP:SECURITY, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:TOO_MANY_REQUESTS, HTTP:UNAUTHORIZED, HTTP:UNSUPPORTED_MEDIA_TYPE">
-			<ee:transform doc:name="Transform Message" doc:id="2e964feb-1f86-4509-a84f-e39e681da9b4" >
+			<ee:transform doc:name="httpRequestErrorResponse" doc:id="2e964feb-1f86-4509-a84f-e39e681da9b4" >
 				<ee:message >
 					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -131,11 +131,11 @@ var mapped = errorTypeMap[errIdentifier]
 } ]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-			<logger level="INFO" doc:name="Logger" doc:id="214fbd95-6a9f-4950-8128-79fb2c4220de" message="#[output application/json &#10;---&#10;payload]" />
-			<set-variable value="#[500]" doc:name="Set Variable" doc:id="d75afdcd-cb25-46b7-9adc-e39fa5b9ca76" variableName="httpStatus" />
+			<logger level="INFO" doc:name="logError" doc:id="214fbd95-6a9f-4950-8128-79fb2c4220de" message="#[output application/json &#10;---&#10;payload]" />
+			<set-variable value="#[500]" doc:name="httpStatus" doc:id="d75afdcd-cb25-46b7-9adc-e39fa5b9ca76" variableName="httpStatus" />
 		</on-error-propagate>
 		<on-error-propagate type="SALESFORCE:COMMUNICATION, SALESFORCE:CONNECTIVITY, SALESFORCE:INSUFFICIENT_PERMISSIONS, SALESFORCE:INVALID_INPUT, SALESFORCE:INVALID_RESPONSE, SALESFORCE:LIMIT_EXCEEDED, SALESFORCE:MUTUAL_AUTHENTICATION_FAILED, SALESFORCE:NOT_FOUND, SALESFORCE:OPERATION_NOT_SUPPORTED, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT, SALESFORCE:UNAVAILABLE" doc:name="On Error Propagate - Salesforce Errors" doc:id="sf-operation-001" enableNotifications="true" logException="true">
-			<ee:transform doc:name="Transform Operation Error" doc:id="sf-operation-transform-001">
+			<ee:transform doc:name="salesforceErrorResponse" doc:id="sf-operation-transform-001">
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -219,27 +219,27 @@ var mapped     = errorRegistry[identifier]
 					<ee:set-variable variableName="outboundHeaders"><![CDATA[{}]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-			<logger level="ERROR" doc:name="Log Operation Error" message="#[output application/json &#10;---&#10;payload]" />
-			<set-variable value="#[500]" doc:name="Set Variable" doc:id="927aa122-5f73-4a6a-9ed6-e22a8fef5bfe" variableName="httpStatus"/>
+			<logger level="ERROR" doc:name="logError" message="#[output application/json &#10;---&#10;payload]" />
+			<set-variable value="#[500]" doc:name="httpStatus" doc:id="927aa122-5f73-4a6a-9ed6-e22a8fef5bfe" variableName="httpStatus"/>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8f593356-ef18-4202-80a6-6a714624b60e" type="SF:RECORD_NOT_FOUD">
-			<ee:transform doc:name="Transform Message" doc:id="5656a843-16cd-49ce-8a7e-de22c2c9a8cd" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8f593356-ef18-4202-80a6-6a714624b60e" type="SF:RECORD_NOT_FOUND, SF:CREATE_ERROR">
+			<ee:transform doc:name="salesforceCustomErrorResponse" doc:id="5656a843-16cd-49ce-8a7e-de22c2c9a8cd" >
 				<ee:message >
 					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
   "statusCode": 500,
-  "message": "ProductId: " ++ (vars.productId) ++ " is not available",
-  "errorCode": "RECORD_NOT_FOUND",
+  "message": payload.message,
+  "errorCode": payload.errorCode,
   "timestamp": now(),
   "transactionId": correlationId,
-  "details": "ProductId: " ++ (vars.productId) ++ " is not available"
+  "details": payload.details
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-			<logger level="INFO" doc:name="Logger" doc:id="66c36ba7-27bb-414e-9870-f9b9c1483e41" />
-			<set-variable value="#[500]" doc:name="Set Variable" doc:id="81c6b040-83f9-4b7a-a36f-0b4d94fd5b72" variableName="httpStatus"/>
+			<logger level="INFO" doc:name="logError" doc:id="66c36ba7-27bb-414e-9870-f9b9c1483e41" />
+			<set-variable value="#[500]" doc:name="httpStatus" doc:id="81c6b040-83f9-4b7a-a36f-0b4d94fd5b72" variableName="httpStatus"/>
 		</on-error-propagate>
 	</error-handler>
 </mule>

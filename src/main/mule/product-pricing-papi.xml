@@ -22,7 +22,7 @@
         <error-handler ref="Global_Error_Handler"/>
     </flow>
     <flow name="get:\products:product-pricing-api-config">
-        <flow-ref doc:name="Flow Reference" doc:id="59444322-b4b1-4894-9fe5-689968d15640" name="get-products-implementationSub_Flow"/>
+        <flow-ref doc:name="get-products-implementationSub_Flow" doc:id="59444322-b4b1-4894-9fe5-689968d15640" name="get-products-implementationSub_Flow"/>
         <error-handler ref="Global_Error_Handler"/>
     </flow>
     <flow name="post:\products:application\json:product-pricing-api-config">

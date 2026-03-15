@@ -8,8 +8,8 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
 	<sub-flow name="update-product-record-implementationSub_Flow" doc:id="bcacd3bc-158a-4a4a-b2a3-7f1f4f82772b" >
 		<logger level="INFO" doc:name="startLogger" doc:id="4a5e62d7-66b4-45c0-9a55-d1394a0f9fbc" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "Start",&#10;	"timeStamp": now()&#10;}]'/>
-		<set-variable value="#[attributes.uriParams.'productId']" doc:name="Set Variable" doc:id="53c1ae12-6539-4ad5-836a-5aa31d7681b0" variableName="productId"/>
-		<salesforce:query doc:name="Query" doc:id="23093bd9-cc96-4f3b-a41f-9ef83924c0b2" config-ref="Salesforce_Config" target="sfId">
+		<set-variable value="#[attributes.uriParams.'productId']" doc:name="productId" doc:id="53c1ae12-6539-4ad5-836a-5aa31d7681b0" variableName="productId"/>
+		<salesforce:query doc:name="queryProductObject" doc:id="23093bd9-cc96-4f3b-a41f-9ef83924c0b2" config-ref="Salesforce_Config" target="sfId">
 			<salesforce:salesforce-query ><![CDATA[select Id from product2 where ProductId__c = ':productId']]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
@@ -19,7 +19,7 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 		</salesforce:query>
 		<choice doc:name="Choice" doc:id="9da77864-c088-4010-871f-120e8a631ace" >
 			<when expression="#[not isEmpty(vars.sfId)]">
-				<ee:transform doc:name="Transform Message" doc:id="05931f2f-20c9-48c5-aa24-a7632484b92f">
+				<ee:transform doc:name="payload" doc:id="05931f2f-20c9-48c5-aa24-a7632484b92f">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/java
@@ -35,10 +35,10 @@ output application/java
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-				<salesforce:update doc:name="Update" doc:id="50108e69-caa7-4187-98e6-fa1bccfcfdd6" config-ref="Salesforce_Config" type="Product2" target="salesforceResponse">
+				<salesforce:update doc:name="updateProductRecord" doc:id="50108e69-caa7-4187-98e6-fa1bccfcfdd6" config-ref="Salesforce_Config" type="Product2" target="salesforceResponse">
 			<salesforce:records><![CDATA[#[[payload]]]]></salesforce:records>
 		</salesforce:update>
-				<ee:transform doc:name="Transform Message" doc:id="ab3a6a49-c5a5-4740-be85-93460bd7fa38">
+				<ee:transform doc:name="responsePayload" doc:id="ab3a6a49-c5a5-4740-be85-93460bd7fa38">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -58,15 +58,19 @@ else
 		</ee:transform>
 			</when>
 			<otherwise >
-				<ee:transform doc:name="Transform Message" doc:id="b53ef16b-1315-46da-bf61-aaea8c1cde67" >
+				<ee:transform doc:name="errorPayload" doc:id="b53ef16b-1315-46da-bf61-aaea8c1cde67" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-"Product Id not available to udpate"]]></ee:set-payload>
+{
+  "message": "ProductId: " ++ (vars.productId) ++ " is not available",
+  "errorCode": "RECORD_NOT_FOUND",
+  "details": "ProductId: " ++ (vars.productId) ++ " is not available"
+}]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
-				<raise-error doc:name="Raise error" doc:id="b56e347e-4a3b-472f-9e7f-a0c07ecd45dd" type="SF:RECORD_NOT_FOUD" description="Product Id not available to udpate"/>
+				<raise-error doc:name="recordNotFoundError" doc:id="b56e347e-4a3b-472f-9e7f-a0c07ecd45dd" type="SF:RECORD_NOT_FOUND" description="Product Id not available to udpate"/>
 			</otherwise>
 		</choice>
 		<logger level="INFO" doc:name="endLogger" doc:id="e1d2d802-a02b-436d-8e8d-9dee6ef9736d" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>
