@@ -168,7 +168,7 @@ output application/json
 var allRates = vars.exchangeRate.rates	++ { (vars.exchangeRate.base) : 1.0 }
 fun exchangeCurrency(fromCurr,toCurr,amount) = ((allRates[toCurr] /allRates[fromCurr])*amount) as String {format : "##.##"} as Number
 ---
-payload map {
+(vars.sfRecords map {
       productId: $.ProductId__c,
       productName: $.Name,
       productCode: $.ProductCode,
@@ -178,7 +178,7 @@ payload map {
       salesforceId: $.Id,
       createdDate: $.CreatedDate,
       lastModifiedDate: $.LastModifiedDate
-    }]]></ee:set-payload>
+    })[0]]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 			</when>
