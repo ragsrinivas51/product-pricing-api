@@ -32,9 +32,7 @@ attributes.queryParams.currencyCode]]></ee:set-variable>
 		</salesforce:query>
 			</route>
 			<route >
-				<ee:cache doc:name="currencyExchangeRateCache" doc:id="ecddade8-26a3-4c46-b112-e3e2d3e84dc1" cachingStrategy-ref="Caching_Strategy">
-					<http:request method="GET" doc:name="Call currencyConversionAPI" doc:id="fb6656b5-3332-412f-a3de-5f46018b72d8" config-ref="HTTP_Request_configuration" path="/exchange" />
-				</ee:cache>
+				<flow-ref doc:name="currencyExchangeRateCache_SubFlow" doc:id="c94a15e4-14e7-4577-9b93-36db5e2773c1" name="currencyExchangeRateCache_SubFlow"/>
 			</route>
 		</scatter-gather>
 		<ee:transform doc:name="totalRecords,exchangeRates" doc:id="e222111f-1bbe-4389-a9c1-d0af3b03f0fa" >
@@ -113,5 +111,94 @@ output application/json
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="endLogger" doc:id="9d06c879-5aeb-4628-86c5-53acf0caf606" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>
+	</sub-flow>
+	<sub-flow name="currencyExchangeRateCache_SubFlow" doc:id="a606b40f-2396-49fe-8545-1542fca68976" >
+		<ee:cache doc:name="currencyExchangeRateCache" doc:id="ecddade8-26a3-4c46-b112-e3e2d3e84dc1" cachingStrategy-ref="Caching_Strategy">
+					<http:request method="GET" doc:name="Call currencyConversionAPI" doc:id="fb6656b5-3332-412f-a3de-5f46018b72d8" config-ref="HTTP_Request_configuration" path="/exchange" />
+				</ee:cache>
+	</sub-flow>
+	<sub-flow name="get-product-record-implementationSub_Flow" doc:id="58f3d0be-87ce-44ce-98c0-0a68d691d7a6" >
+		<logger level="INFO" doc:name="startLogger" doc:id="f4a3a905-c838-4c30-9e80-4d7d6777388a" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "Start",&#10;	"timeStamp": now()&#10;}]'/>
+		<set-variable value="#[attributes.uriParams.'productId']" doc:name="productId" doc:id="267da502-7289-420d-bb7e-57177412196f" variableName="productId"/>
+		<ee:transform doc:name="Transform Message" doc:id="72c5ec86-c2ea-4c4a-b7ee-b3c4be6f4b33" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="currencyCode" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.queryParams.currencyCode]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="5cf87b76-da1c-41ee-b1bc-17d25a6b8933" >
+			<route >
+				<salesforce:query doc:name="queryProductObject" doc:id="0a8f6449-eafd-45e2-be2f-062459da221d" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[Select Id,Name, Description, ProductId__c, CurrencyCode__c,ProductPrice__c,  ProductCode, CreatedDate, LastModifiedDate from product2 where ProductId__c = ':productId']]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	productId : vars.productId
+}]]]></salesforce:parameters>
+		</salesforce:query>
+			</route>
+			<route >
+				<flow-ref doc:name="currencyExchangeRateCache_SubFlow" doc:id="12719185-c86d-48a9-b20a-a5d425465375" name="currencyExchangeRateCache_SubFlow"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="sfRecords, exchangeRates" doc:id="c851d763-af94-40df-8868-818bc20c9c26" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="exchangeRate" ><![CDATA[%dw 2.0
+output application/json
+---
+payload[1].payload]]></ee:set-variable>
+				<ee:set-variable variableName="sfRecords" ><![CDATA[%dw 2.0
+output application/json
+---
+payload[0].payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="faa7ffba-ebb5-41c6-bbf6-5cc43d5565e5" >
+			<when expression="#[not isEmpty(payload)]">
+				<ee:transform doc:name="responsePayload" doc:id="c45b4c3b-eacb-4092-9da6-168685039d73" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var allRates = vars.exchangeRate.rates	++ { (vars.exchangeRate.base) : 1.0 }
+fun exchangeCurrency(fromCurr,toCurr,amount) = ((allRates[toCurr] /allRates[fromCurr])*amount) as String {format : "##.##"} as Number
+---
+payload map {
+      productId: $.ProductId__c,
+      productName: $.Name,
+      productCode: $.ProductCode,
+      description: $.Description,
+      currencyCode: vars.CurrencyCode,
+      productPrice: exchangeCurrency($.CurrencyCode__c,vars.CurrencyCode,$.ProductPrice__c),
+      salesforceId: $.Id,
+      createdDate: $.CreatedDate,
+      lastModifiedDate: $.LastModifiedDate
+    }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="errorPayload" doc:id="1ab9928e-b261-4b9e-a764-180bd56cf1bb" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"statusCode" : 404,
+  "message": "ProductId: " ++ (vars.productId) ++ " is not available",
+  "errorCode": "RECORD_NOT_FOUND",
+  "details": "ProductId: " ++ (vars.productId) ++ " is not available"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<raise-error doc:name="recordNotFoundError" doc:id="243eb843-a0e3-4d2c-a1a3-aa97a34ad63c" type="SF:RECORD_NOT_FOUND" description="ProductID is not valid"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="endLogger" doc:id="7187f869-292f-436b-a7a3-1c37db2ea44f" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "End",&#10;	"timeStamp": now()&#10;}]'/>
 	</sub-flow>
 </mule>

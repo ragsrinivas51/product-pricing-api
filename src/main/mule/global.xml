@@ -31,7 +31,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 	 <http:listener-config name="product-pricing-api-httpListenerConfig">
         <http:listener-connection host="${http.host}" port="${http.port}" />
     </http:listener-config>
-    <apikit:config name="product-pricing-api-config" api="resource::ae33d189-b1a6-478e-8a64-6a158275d6b7:product-pricing-api:1.0.1:raml:zip:product-pricing-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="product-pricing-api-config" api="resource::ae33d189-b1a6-478e-8a64-6a158275d6b7:product-pricing-api:1.0.3:raml:zip:product-pricing-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
 	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="9c090578-69ad-49a9-94c7-c6efdb59d221" keyGenerationExpression="#[now() as Date]" objectStore="Cache_Object_store"/>
 	<os:object-store name="Cache_Object_store" doc:name="Object store" doc:id="4f81c7ff-92e6-470a-9219-adcaf4f43642" maxEntries="${os.max.entries}" entryTtl="${os.entry.ttl}" entryTtlUnit="DAYS" expirationIntervalUnit="HOURS" expirationInterval="${os.expiration.interval}"/>
 	<configuration-properties doc:name="Configuration properties" doc:id="dc72cbb6-6d15-4a2d-ad42-895e36264818" file="config/properties-${env}.yaml" />
@@ -50,15 +50,15 @@ output application/json
 {
   "statusCode": 500,
   "message": "Internal Server Error",
-  "errorCode": "INTERNAL_SERVER_ERROR",
+  "error": "INTERNAL_SERVER_ERROR",
   "timestamp": now(),
-  "transactionId": correlationId,
+  "correlationId": correlationId,
   "details": "An unexpected error occurred. Please contact support with transaction ID: " ++ correlationId
 }]]></ee:set-payload>
 				</ee:message>
 				<ee:variables>
-					<ee:set-variable variableName="httpStatus">500</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
+					<ee:set-variable variableName="outboundHeaders"><![CDATA[{}]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 			<logger level="ERROR" doc:name="logError" message="#[output application/json &#10;---&#10;payload]" />
@@ -83,9 +83,9 @@ var mapped     = errorRegistry[identifier]
 {
   "statusCode": mapped.status default 500,
   "message": mapped.message default error.description,
-  "errorCode": "HTTP_" ++ identifier,
+  "error": "HTTP_" ++ identifier,
   "timestamp": now(),
-  "transactionId": correlationId,
+  "correlationId": correlationId,
   "details": error.detailedDescription default mapped.details
 }]]></ee:set-payload>
 				</ee:message>
@@ -124,9 +124,9 @@ var mapped = errorTypeMap[errIdentifier]
 {
 	"statusCode": mapped.status,
   	"message": error.errorMessage.payload default "Internal server error",
-  	"errorCode": errIdentifier,
+  	"error": errIdentifier,
   	"timestamp": now(),
-  	"transactionId": correlationId,
+  	"correlationId": correlationId,
   	"details": mapped.msg default error.detailedDescription 
 } ]]></ee:set-payload>
 				</ee:message>
@@ -208,9 +208,9 @@ var mapped     = errorRegistry[identifier]
  {
 	"statusCode": mapped.status  default 500,
 	"message": mapped.message default error.description,
-	"errorCode": "SALESFORCE_" ++ identifier,
+	"error": "SALESFORCE_" ++ identifier,
 	"timestamp": now(),
-	"transactionId": correlationId,
+	"correlationId": correlationId,
 	"details": error.detailedDescription default mapped.details default "An unexpected Salesforce error occurred"
  }]]></ee:set-payload>
 				</ee:message>
@@ -229,11 +229,11 @@ var mapped     = errorRegistry[identifier]
 output application/json
 ---
 {
-  "statusCode": 500,
+  "statusCode": payload.statusCode,
   "message": payload.message,
-  "errorCode": payload.errorCode,
+  "error": payload.errorCode,
   "timestamp": now(),
-  "transactionId": correlationId,
+  "correlationId": correlationId,
   "details": payload.details
 }]]></ee:set-payload>
 				</ee:message>

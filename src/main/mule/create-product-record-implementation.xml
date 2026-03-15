@@ -53,6 +53,7 @@ else
 output application/java
 ---
 {
+	"statusCode" : 409,
 	"message": vars.salesforceResponse.items[0].message,
   	"errorCode": vars.salesforceResponse.items[0].statusCode ,
   	"details": vars.salesforceResponse.items[0].message

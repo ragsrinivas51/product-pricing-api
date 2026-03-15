@@ -21,6 +21,10 @@
 		<flow-ref doc:name="update-product-record-implementationSub_Flow" doc:id="1a8ab6f7-e8e3-4ad8-b141-46114d7d911a" name="update-product-record-implementationSub_Flow"/>
         <error-handler ref="Global_Error_Handler"/>
     </flow>
+    <flow name="get:\products\(productId):application\json:product-pricing-api-config">
+		<flow-ref doc:name="get-product-record-implementationSub_Flow" doc:id="7eb6a5a5-2a30-431b-9778-72a9a4c664c2" name="get-product-record-implementationSub_Flow"/>
+        <error-handler ref="Global_Error_Handler"/>
+    </flow>
     <flow name="get:\products:product-pricing-api-config">
         <flow-ref doc:name="get-products-implementationSub_Flow" doc:id="59444322-b4b1-4894-9fe5-689968d15640" name="get-products-implementationSub_Flow"/>
         <error-handler ref="Global_Error_Handler"/>
