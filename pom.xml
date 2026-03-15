@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ae33d189-b1a6-478e-8a64-6a158275d6b7</groupId>
-	<artifactId>product-pricing-api</artifactId>
+	<artifactId>product-pricing-papi</artifactId>
 	<version>1.0.7</version>
 	<packaging>mule-application</packaging>
 
-	<name>product-pricing-api</name>
+	<name>product-pricing-papi</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
