@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ae33d189-b1a6-478e-8a64-6a158275d6b7</groupId>
-	<artifactId>ecomm-${env}-product-pricing-api</artifactId>
+	<artifactId>ecomm-product-pricing-api</artifactId>
 	<version>1.0.7</version>
 	<packaging>mule-application</packaging>
 
-	<name>ecomm-${env}-product-pricing-api</name>
+	<name>ecomm-product-pricing-api</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -47,7 +47,7 @@
 						<environment>${cloudhub2.environment}</environment>
 						<target>${cloudhub2.target}</target>
 						<muleVersion>${mule.runtime.version}</muleVersion>
-						<applicationName>${project.artifactId}</applicationName>
+						<applicationName>ecomm-${env}-product-pricing-api</applicationName>
 						<replicas>${cloudhub2.replicas}</replicas>
 						<vCores>${cloudhub2.vcores}</vCores>
 						<deploymentSettings>
