@@ -68,6 +68,7 @@
 						<environment>${cloudhub2.environment}</environment>
 						<target>${cloudhub2.target}</target>
 						<muleVersion>${mule.runtime.version}</muleVersion>
+						<artifactId>ecomm-product-pricing-api</artifactId>
 						<applicationName>ecomm-${env}-product-pricing-api</applicationName>
 						<replicas>${cloudhub2.replicas}</replicas>
 						<vCores>${cloudhub2.vcores}</vCores>
