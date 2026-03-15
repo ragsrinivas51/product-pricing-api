@@ -1,0 +1,206 @@
+{
+  "info": {
+    "_postman_id": "319fd60a-aabc-4879-a8ad-a78977e55302",
+    "name": "Product pricing API Copy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "34279476"
+  },
+  "item": [
+    {
+      "name": "Get Products",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "client_id",
+            "value": "{{clientId}}",
+            "type": "text"
+          },
+          {
+            "key": "client_secret",
+            "value": "{{clientSecret}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{host}}/api/{{version}}/products?limit=20&offset=200&currencyCode=USD",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "{{version}}",
+            "products"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            },
+            {
+              "key": "offset",
+              "value": "200"
+            },
+            {
+              "key": "currencyCode",
+              "value": "USD"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Product",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "client_id",
+            "value": "{{clientId}}",
+            "type": "text"
+          },
+          {
+            "key": "client_secret",
+            "value": "{{clientSecret}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"productName\": \"Acer Aspire 3 A315-58\",\r\n    \"description\": \"Acer Aspire 3 Core i5 11th Gen/8GB/512GB SSD/Win11 FHD\",\r\n    \"currencyCode\": \"USD\",\r\n    \"productPrice\": 404.48\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{host}}/api/{{version}}/products",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "{{version}}",
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Product",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "client_id",
+            "value": "{{clientId}}",
+            "type": "text"
+          },
+          {
+            "key": "client_secret",
+            "value": "{{clientSecret}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{host}}/api/{{version}}/products/P0000000001",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "{{version}}",
+            "products",
+            "P0000000001"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Product",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "client_id",
+            "value": "{{clientId}}",
+            "type": "text"
+          },
+          {
+            "key": "client_secret",
+            "value": "{{clientSecret}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{host}}/api/{{version}}/products/P0000000001",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "api",
+            "{{version}}",
+            "products",
+            "P0000000001"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": ""
+    },
+    {
+      "key": "clientId",
+      "value": ""
+    },
+    {
+      "key": "clientSecret",
+      "value": ""
+    },
+    {
+      "key": "version",
+      "value": ""
+    }
+  ]
+}

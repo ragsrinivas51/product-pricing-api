@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
 	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:os="http://www.mulesoft.org/schema/mule/os"
-	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
-http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
 	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="8e161c2c-6433-472a-9303-69339c85db95" >
 		<salesforce:oauth-client-credentials-connection >
 			<reconnection >
@@ -34,341 +35,13 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="9c090578-69ad-49a9-94c7-c6efdb59d221" keyGenerationExpression="#[now() as Date]" objectStore="Cache_Object_store"/>
 	<os:object-store name="Cache_Object_store" doc:name="Object store" doc:id="4f81c7ff-92e6-470a-9219-adcaf4f43642" maxEntries="${os.max.entries}" entryTtl="${os.entry.ttl}" entryTtlUnit="DAYS" expirationIntervalUnit="HOURS" expirationInterval="${os.expiration.interval}"/>
 	<configuration-properties doc:name="Configuration properties" doc:id="dc72cbb6-6d15-4a2d-ad42-895e36264818" file="config/properties-${env}.yaml" />
-	<api-gateway:autodiscovery apiId="${api.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="dcb6bbf2-f624-4bd2-b70f-8769e6d3d1da" flowRef="product-pricing-api-main" />
-	
+<!-- 	<api-gateway:autodiscovery apiId="${api.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="dcb6bbf2-f624-4bd2-b70f-8769e6d3d1da" flowRef="product-pricing-api-main" />
+ -->	
 	<error-handler name="Global_Error_Handler" doc:id="a835458d-da8c-4204-84ac-51abd86c5ffc">
-		
-
-		<on-error-propagate type="SALESFORCE:COMMUNICATION,SALESFORCE:CONNECTIVITY,SALESFORCE:UNAVAILABLE,SALESFORCE:TIMEOUT" doc:name="Salesforce Connectivity Error Handler" doc:id="sf-connectivity-001">
-			<logger level="ERROR" doc:name="Log Salesforce Connectivity Error" message="#[output application/json ---{ 'errorType': error.errorType.identifier, 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name, 'message': error.description }]"/>
-			<ee:transform doc:name="Transform Salesforce Connectivity Error" doc:id="sf-connectivity-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 503,
-  "message": "Salesforce Service Unavailable",
-  "errorCode": error.errorType.identifier,
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "Unable to connect to Salesforce. Please try again later."
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">503</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		
-		<on-error-propagate type="SALESFORCE:INVALID_INPUT,SALESFORCE:INVALID_RESPONSE,SALESFORCE:NOT_FOUND" doc:name="Salesforce Data/Query Error Handler" doc:id="sf-data-001" enableNotifications="true" logException="true">
-			<logger level="ERROR" doc:name="Log Salesforce Data Error" message="#[output application/json ---{ 'errorType': error.errorType.identifier, 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name, 'message': error.description }]"/>
-			<ee:transform doc:name="Transform Data Error Response" doc:id="sf-data-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 400,
-  "message": "Invalid Salesforce Data Request",
-  "errorCode": error.errorType.identifier,
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": if (error.errorType.identifier contains "MALFORMED_QUERY") "The SOQL query is malformed" else if (error.errorType.identifier contains "INVALID_FIELD") "One or more fields don't exist in Salesforce" else if (error.errorType.identifier contains "INVALID_TYPE") "Invalid object type specified" else "Invalid input data for Salesforce operation"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">400</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="SALESFORCE:LIMIT_EXCEEDED,SALESFORCE:RETRY_EXHAUSTED" doc:name="Salesforce Rate Limit Error Handler" doc:id="sf-limit-001">
-			<logger level="WARN" doc:name="Log Rate Limit Error" message="#[output application/json ---{ 'errorType': error.errorType.identifier, 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name, 'message': 'Salesforce rate limit exceeded' }]"/>
-			<ee:transform doc:name="Transform Rate Limit Response" doc:id="sf-limit-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 429,
-  "message": "Too Many Requests - Salesforce Rate Limit Exceeded",
-  "errorCode": error.errorType.identifier,
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "Salesforce API rate limit has been exceeded. Please retry after some time."
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">429</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{'Retry-After': '60'}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="SALESFORCE:OPERATION_NOT_SUPPORTED" doc:name="Salesforce Operation Error Handler" doc:id="sf-operation-001">
-			<logger level="ERROR" doc:name="Log Operation Error" message="#[output application/json ---{ 'errorType': error.errorType.identifier, 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name, 'message': error.description }]"/>
-			<ee:transform doc:name="Transform Operation Error" doc:id="sf-operation-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 501,
-  "message": "Operation Not Supported",
-  "errorCode": error.errorType.identifier,
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "The requested operation is not supported in Salesforce or has been disabled"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">501</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="STREAM_MAXIMUM_SIZE_EXCEEDED" doc:name="Stream Size Exceeded Error Handler" doc:id="stream-size-001">
-			<logger level="WARN" doc:name="Log Stream Size Error" message="#[output application/json ---{ 'errorType': 'STREAM_SIZE_EXCEEDED', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name }]"/>
-			<ee:transform doc:name="Transform Stream Size Error" doc:id="stream-size-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 413,
-  "message": "Payload Too Large",
-  "errorCode": "STREAM_MAXIMUM_SIZE_EXCEEDED",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "The request payload exceeds the maximum allowed size"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">413</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-
-		<on-error-propagate type="HTTP:TIMEOUT" doc:name="HTTP Request Timeout Handler" doc:id="http-req-timeout-001">
-			<logger level="ERROR" doc:name="Log Request Timeout" message="#[output application/json ---{ 'errorType': 'HTTP_TIMEOUT', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name, 'message': 'External HTTP request timeout' }]"/>
-			<ee:transform doc:name="Transform Timeout Response" doc:id="http-req-timeout-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 504,
-  "message": "Gateway Timeout",
-  "errorCode": "HTTP:TIMEOUT",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "The external service did not respond within the expected timeframe"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">504</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="HTTP:CONNECTIVITY" doc:name="HTTP Connectivity Error Handler" doc:id="http-req-conn-001">
-			<logger level="ERROR" doc:name="Log Connectivity Error" message="#[output application/json ---{ 'errorType': 'HTTP_CONNECTIVITY', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name }]"/>
-			<ee:transform doc:name="Transform Connectivity Error" doc:id="http-req-conn-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 502,
-  "message": "Bad Gateway - Service Unavailable",
-  "errorCode": "HTTP:CONNECTIVITY",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "Unable to connect to the external service"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">502</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="HTTP:BAD_REQUEST" doc:name="HTTP Bad Request Handler" doc:id="http-req-400-001">
-			<logger level="WARN" doc:name="Log Bad Request" message="#[output application/json ---{ 'errorType': 'HTTP_BAD_REQUEST', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name }]"/>
-			<ee:transform doc:name="Transform Bad Request" doc:id="http-req-400-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 400,
-  "message": "Bad Request - Malformed Request",
-  "errorCode": "HTTP:BAD_REQUEST",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "The external service received a malformed request"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">400</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="HTTP:UNAUTHORIZED" doc:name="HTTP Unauthorized Handler" doc:id="http-req-401-001">
-			<logger level="WARN" doc:name="Log Unauthorized" message="#[output application/json ---{ 'errorType': 'HTTP_UNAUTHORIZED', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name }]"/>
-			<ee:transform doc:name="Transform Unauthorized" doc:id="http-req-401-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 401,
-  "message": "Unauthorized - Invalid Credentials",
-  "errorCode": "HTTP:UNAUTHORIZED",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "The external service requires valid authentication"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">401</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="HTTP:FORBIDDEN" doc:name="HTTP Forbidden Handler" doc:id="http-req-403-001">
-			<logger level="WARN" doc:name="Log Forbidden" message="#[output application/json ---{ 'errorType': 'HTTP_FORBIDDEN', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name }]"/>
-			<ee:transform doc:name="Transform Forbidden" doc:id="http-req-403-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 403,
-  "message": "Forbidden - Access Denied",
-  "errorCode": "HTTP:FORBIDDEN",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "Access to the external resource is forbidden"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">403</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="HTTP:NOT_FOUND" doc:name="HTTP Not Found Handler" doc:id="http-req-404-001">
-			<logger level="WARN" doc:name="Log Not Found" message="#[output application/json ---{ 'errorType': 'HTTP_NOT_FOUND', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name }]"/>
-			<ee:transform doc:name="Transform Not Found" doc:id="http-req-404-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 404,
-  "message": "Not Found - Resource Not Available",
-  "errorCode": "HTTP:NOT_FOUND",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "The requested external resource was not found"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">404</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		
-		
-		<on-error-propagate type="HTTP:TOO_MANY_REQUESTS" doc:name="HTTP Rate Limit Handler" doc:id="http-req-429-001">
-			<logger level="WARN" doc:name="Log Rate Limit" message="#[output application/json ---{ 'errorType': 'HTTP_TOO_MANY_REQUESTS', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name }]"/>
-			<ee:transform doc:name="Transform Rate Limit" doc:id="http-req-429-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 429,
-  "message": "Too Many Requests - Rate Limit Exceeded",
-  "errorCode": "HTTP:TOO_MANY_REQUESTS",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "The external service rate limit has been exceeded"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">429</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{'Retry-After': '60'}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="HTTP:INTERNAL_SERVER_ERROR" doc:name="HTTP Server Error Handler" doc:id="http-req-500-001">
-			<logger level="ERROR" doc:name="Log Server Error" message="#[output application/json ---{ 'errorType': 'HTTP_INTERNAL_SERVER_ERROR', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name }]"/>
-			<ee:transform doc:name="Transform Server Error" doc:id="http-req-500-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 502,
-  "message": "Bad Gateway - External Server Error",
-  "errorCode": "HTTP:INTERNAL_SERVER_ERROR",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "The external service encountered an internal server error"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">502</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
-		
-		<on-error-propagate type="HTTP:SERVICE_UNAVAILABLE" doc:name="HTTP Service Unavailable Handler" doc:id="http-req-503-001">
-			<logger level="WARN" doc:name="Log Service Unavailable" message="#[output application/json ---{ 'errorType': 'HTTP_SERVICE_UNAVAILABLE', 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name }]"/>
-			<ee:transform doc:name="Transform Service Unavailable" doc:id="http-req-503-transform-001">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  "statusCode": 503,
-  "message": "Service Unavailable",
-  "errorCode": "HTTP:SERVICE_UNAVAILABLE",
-  "timestamp": now(),
-  "transactionId": correlationId,
-  "details": "The external service is temporarily unavailable"
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus">503</ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders">{'Retry-After': '120'}</ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</on-error-propagate>
 		
 		
 		
 		<on-error-propagate type="EXPRESSION" doc:name="Default Catch-All Error Handler" doc:id="catchall-001" enableNotifications="true" logException="true">
-			<logger level="ERROR" doc:name="Log Unhandled Error" message="#[output application/json ---{ 'errorType': error.errorType.identifier, 'timestamp': now(), 'transactionId': correlationId, 'flow': flow.name, 'message': error.message default error.description, 'namespace': error.errorType.namespace, 'causeException': error.cause.message default 'N/A' }]"/>
 			<ee:transform doc:name="Transform Generic Error Response" doc:id="catchall-transform-001">
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0
@@ -388,6 +61,166 @@ output application/json
 					<ee:set-variable variableName="outboundHeaders">{}</ee:set-variable>
 				</ee:variables>
 			</ee:transform>
+			<logger level="ERROR" doc:name="Log Unhandled Error" message="#[output application/json &#10;---&#10;payload]" />
+			<set-variable value="#[payload.statusCode]" doc:name="Set Variable" doc:id="947ee37c-4313-4d5d-9a58-18142b59571b" variableName="httpStatus"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate - APIKIT Errors" doc:id="9f006e21-baac-4d3d-bf35-67d1abb540f7" type="APIKIT:BAD_REQUEST, APIKIT:NOT_FOUND, APIKIT:METHOD_NOT_ALLOWED, APIKIT:NOT_ACCEPTABLE, APIKIT:UNSUPPORTED_MEDIA_TYPE, APIKIT:NOT_IMPLEMENTED">
+			<ee:transform doc:name="Transform Message" doc:id="5251cbda-5bf3-4985-aced-add118316548">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var errorRegistry = {
+                        "BAD_REQUEST":            { status: 400, message: "Bad Request - The request could not be understood or was missing required parameters",       details: "The request could not be processed due to invalid or missing required parameters" },
+                        "NOT_FOUND":              { status: 404, message: "Not Found - The requested resource could not be found",                                     details: "The requested external resource was not found" },
+                        "METHOD_NOT_ALLOWED":     { status: 405, message: "Method Not Allowed - The HTTP method is not supported for this endpoint",                   details: "The HTTP method used in the request is not allowed for the requested resource" },
+                        "NOT_ACCEPTABLE":         { status: 406, message: "Not Acceptable - The server cannot produce a response matching the Accept headers",         details: "The requested resource cannot generate content acceptable to the client based on Accept headers" },
+                        "UNSUPPORTED_MEDIA_TYPE": { status: 415, message: "Unsupported Media Type - The request payload format is not supported",                      details: "The Content-Type of the request payload is not supported by this endpoint" },
+                        "NOT_IMPLEMENTED":        { status: 501, message: "Not Implemented - The requested functionality is not yet implemented",                      details: "The server does not support the functionality required to fulfil the request" }
+                    }
+var identifier = error.errorType.identifier
+var mapped     = errorRegistry[identifier]
+---
+{
+  "statusCode": mapped.status default 500,
+  "message": mapped.message default error.description,
+  "errorCode": "HTTP_" ++ identifier,
+  "timestamp": now(),
+  "transactionId": correlationId,
+  "details": error.detailedDescription default mapped.details
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="b6c8d109-aa54-4c8b-bcff-55579338cb45" message="#[output application/json &#10;---&#10;payload]"/>
+			<set-variable value="#[payload.statusCode]" doc:name="Set Variable" doc:id="99461fbc-93ee-4e96-884f-6d0e0bd2bb31" variableName="httpStatus" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate - HTTP Request Errors" doc:id="65a39c07-fe1b-4583-bfb7-85bd1d5348cb" type="HTTP:BAD_GATEWAY, HTTP:BAD_REQUEST, HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:INTERNAL_SERVER_ERROR, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_ACCEPTABLE, HTTP:NOT_FOUND, HTTP:PARSING, HTTP:RETRY_EXHAUSTED, HTTP:SECURITY, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:TOO_MANY_REQUESTS, HTTP:UNAUTHORIZED, HTTP:UNSUPPORTED_MEDIA_TYPE">
+			<ee:transform doc:name="Transform Message" doc:id="2e964feb-1f86-4509-a84f-e39e681da9b4" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var errorTypeMap = {
+      "BAD_GATEWAY":      { status: 502, msg: "Bad Gateway - Invalid response from upstream server" },
+      "BAD_REQUEST":      { status: 400, msg: "Bad Request - The request could not be understood due to malformed syntax" },
+      "CLIENT_SECURITY":  { status: 401, msg: "Client Security Error - A client security violation occurred" },
+      "CONNECTIVITY":     { status: 503, msg: "Connectivity Error - Unable to connect to the remote service" },
+      "FORBIDDEN":        { status: 403, msg: "Forbidden - You do not have permission to access this resource" },
+      "INTERNAL_SERVER_ERROR":  { status: 500, msg: "Internal Server Error - An unexpected error occurred" },
+      "METHOD_NOT_ALLOWED":     { status: 405, msg: "Method Not Allowed - The HTTP method is not supported for this endpoint" },
+      "NOT_ACCEPTABLE":         { status: 406, msg: "Not Acceptable - The server cannot produce a response matching the Accept headers" },
+      "NOT_FOUND":        { status: 404, msg: "Not Found - The requested resource could not be found" },
+      "PARSING":          { status: 400, msg: "Parsing Error - The request or response body could not be parsed" },
+      "RETRY_EXHAUSTED":  { status: 503, msg: "Retry Exhausted - Maximum retry attempts have been exceeded" },
+      "SECURITY":         { status: 401, msg: "Security Error - A security violation occurred during the request" },
+      "SERVICE_UNAVAILABLE":    { status: 503, msg: "Service Unavailable - The upstream service is temporarily unavailable" },
+      "TIMEOUT":          { status: 504, msg: "Gateway Timeout - The upstream service did not respond in time" },
+      "TOO_MANY_REQUESTS":      { status: 429, msg: "Too Many Requests - Rate limit exceeded, please retry after some time" },
+      "UNAUTHORIZED":           { status: 401, msg: "Unauthorized - Authentication is required to access this resource" },
+      "UNSUPPORTED_MEDIA_TYPE": { status: 415, msg: "Unsupported Media Type - The request payload format is not supported" }
+   }
+var errIdentifier = error.errorType.identifier
+var mapped = errorTypeMap[errIdentifier]
+---
+
+{
+	"statusCode": mapped.status,
+  	"message": error.errorMessage.payload default "Internal server error",
+  	"errorCode": errIdentifier,
+  	"timestamp": now(),
+  	"transactionId": correlationId,
+  	"details": mapped.msg default error.detailedDescription 
+} ]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="214fbd95-6a9f-4950-8128-79fb2c4220de" message="#[output application/json &#10;---&#10;payload]" />
+			<set-variable value="#[500]" doc:name="Set Variable" doc:id="d75afdcd-cb25-46b7-9adc-e39fa5b9ca76" variableName="httpStatus" />
+		</on-error-propagate>
+		<on-error-propagate type="SALESFORCE:COMMUNICATION, SALESFORCE:CONNECTIVITY, SALESFORCE:INSUFFICIENT_PERMISSIONS, SALESFORCE:INVALID_INPUT, SALESFORCE:INVALID_RESPONSE, SALESFORCE:LIMIT_EXCEEDED, SALESFORCE:MUTUAL_AUTHENTICATION_FAILED, SALESFORCE:NOT_FOUND, SALESFORCE:OPERATION_NOT_SUPPORTED, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT, SALESFORCE:UNAVAILABLE" doc:name="On Error Propagate - Salesforce Errors" doc:id="sf-operation-001" enableNotifications="true" logException="true">
+			<ee:transform doc:name="Transform Operation Error" doc:id="sf-operation-transform-001">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var errorRegistry = {
+                        "COMMUNICATION": {
+                            status: 503,
+                            message: "Communication Error - Failed to communicate with Salesforce",
+                            details: "An error occurred while communicating with the Salesforce service"
+                        },
+                        "CONNECTIVITY": {
+                            status: 503,
+                            message: "Connectivity Error - Unable to establish connection to Salesforce",
+                            details: "The connection to Salesforce could not be established or was lost"
+                        },
+                        "INSUFFICIENT_PERMISSIONS": {
+                            status: 403,
+                            message: "Insufficient Permissions - The user does not have required Salesforce permissions",
+                            details: "The authenticated user lacks the necessary permissions to perform this operation in Salesforce"
+                        },
+                        "INVALID_INPUT": {
+                            status: 400,
+                            message: "Invalid Input - The data provided does not meet Salesforce requirements",
+                            details: "The request contains invalid or malformed data that cannot be processed by Salesforce"
+                        },
+                        "INVALID_RESPONSE": {
+                            status: 502,
+                            message: "Invalid Response - Salesforce returned an unexpected or malformed response",
+                            details: "The response received from Salesforce could not be parsed or is in an unexpected format"
+                        },
+                        "LIMIT_EXCEEDED": {
+                            status: 429,
+                            message: "Limit Exceeded - Salesforce API limit or governor limit has been exceeded",
+                            details: "The request has exceeded the allowed Salesforce API or governor limits, please retry after some time"
+                        },
+                        "MUTUAL_AUTHENTICATION_FAILED": {
+                            status: 401,
+                            message: "Mutual Authentication Failed - Salesforce mutual TLS authentication could not be completed",
+                            details: "The mutual authentication handshake with Salesforce failed, please verify certificates and credentials"
+                        },
+                        "NOT_FOUND": {
+                            status: 404,
+                            message: "Not Found - The requested Salesforce record or resource does not exist",
+                            details: "The specified Salesforce resource, record or object could not be found"
+                        },
+                        "OPERATION_NOT_SUPPORTED": {
+                            status: 405,
+                            message: "Operation Not Supported - The requested operation is not supported in Salesforce",
+                            details: "The attempted operation is not allowed or supported for this Salesforce resource"
+                        },
+                        "RETRY_EXHAUSTED": {
+                            status: 503,
+                            message: "Retry Exhausted - Maximum retry attempts to Salesforce have been exceeded",
+                            details: "All retry attempts to connect or interact with Salesforce have been exhausted"
+                        },
+                        "TIMEOUT": {
+                            status: 504,
+                            message: "Timeout - The Salesforce request did not complete within the allowed time",
+                            details: "The connection or operation to Salesforce timed out before a response was received"
+                        },
+                        "UNAVAILABLE": {
+                            status: 503,
+                            message: "Unavailable - The Salesforce service is temporarily unavailable",
+                            details: "Salesforce is currently unavailable, please try again later"
+                        }
+                    }
+
+var identifier = error.errorType.identifier
+var mapped     = errorRegistry[identifier]
+---
+ {
+	"statusCode": mapped.status  default 500,
+	"message": mapped.message default error.description,
+	"errorCode": "SALESFORCE_" ++ identifier,
+	"timestamp": now(),
+	"transactionId": correlationId,
+	"details": error.detailedDescription default mapped.details default "An unexpected Salesforce error occurred"
+ }]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+					<ee:set-variable variableName="outboundHeaders"><![CDATA[{}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<logger level="ERROR" doc:name="Log Operation Error" message="#[output application/json &#10;---&#10;payload]" />
+			<set-variable value="#[500]" doc:name="Set Variable" doc:id="927aa122-5f73-4a6a-9ed6-e22a8fef5bfe" variableName="httpStatus"/>
 		</on-error-propagate>
 	</error-handler>
 </mule>
