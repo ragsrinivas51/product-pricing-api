@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ae33d189-b1a6-478e-8a64-6a158275d6b7</groupId>
-	<artifactId>ecomm-product-pricing-api</artifactId>
+	<artifactId>product-pricing-api</artifactId>
 	<version>1.0.7</version>
 	<packaging>mule-application</packaging>
 
-	<name>ecomm-${env}-product-pricing-api</name>
+	<name>product-pricing-api</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,27 +32,6 @@
 				<version>3.2.0</version>
 			</plugin>
 			<plugin>
-			  <groupId>org.mule.tools.maven</groupId>
-			  <artifactId>exchange-mule-maven-plugin</artifactId>
-			  <version>0.0.23</version>
-			  <executions>
-				<execution>
-				  <id>validate</id>
-				  <phase>deploy</phase>
-				  <goals>
-					<goal>exchange-pre-deploy</goal>
-				  </goals>
-				</execution>
-				<execution>
-				  <id>deploy</id>
-				  <phase>deploy</phase>
-				  <goals>
-					<goal>exchange-deploy</goal>
-				  </goals>
-				</execution>
-			  </executions>
-			</plugin>
-			<plugin>
 				<groupId>org.mule.tools.maven</groupId>
 				<artifactId>mule-maven-plugin</artifactId>
 				<version>${mule.maven.plugin.version}</version>
@@ -68,8 +47,7 @@
 						<environment>${cloudhub2.environment}</environment>
 						<target>${cloudhub2.target}</target>
 						<muleVersion>${mule.runtime.version}</muleVersion>
-						<artifactId>ecomm-product-pricing-api</artifactId>
-						<applicationName>ecomm-${env}-product-pricing-api</applicationName>
+						<applicationName>${project.artifactId}</applicationName>
 						<replicas>${cloudhub2.replicas}</replicas>
 						<vCores>${cloudhub2.vcores}</vCores>
 						<deploymentSettings>
