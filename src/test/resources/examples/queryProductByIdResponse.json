@@ -9,6 +9,6 @@
     "type": "Product2",
     "CurrencyCode__c": "INR",
     "Name": "Apple 2025 MacBook Air (13-inch, Apple M4 chip with 10-core CPU and 8-core GPU, 16GB Unified Memory, 256GB) - Silver",
-    "ProductId__c": "P00000000001"
+    "ExternalId__c": "P00000000001"
   }
 ]

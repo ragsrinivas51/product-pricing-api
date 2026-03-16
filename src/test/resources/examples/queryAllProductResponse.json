@@ -9,7 +9,7 @@
     "type": "Product2",
     "CurrencyCode__c": "INR",
     "Name": "Apple 2025 MacBook Air (13-inch, Apple M4 chip with 10-core CPU and 8-core GPU, 16GB Unified Memory, 256GB) - Silver",
-    "ProductId__c": "P00000000001"
+    "ExternalId__c": "P00000000001"
   },
   {
     "LastModifiedDate": "2026-03-14T13:23:52.000Z",
@@ -21,7 +21,7 @@
     "type": "Product2",
     "CurrencyCode__c": "USD",
     "Name": "Dell Inspiron 15 3530",
-    "ProductId__c": "P00000000002"
+    "ExternalId__c": "P00000000002"
   },
   {
     "LastModifiedDate": "2026-03-14T13:23:52.000Z",
@@ -33,7 +33,7 @@
     "type": "Product2",
     "CurrencyCode__c": "USD",
     "Name": "Dell Inspiron 14 5440",
-    "ProductId__c": "P00000000003"
+    "ExternalId__c": "P00000000003"
   },
   {
     "LastModifiedDate": "2026-03-14T13:23:52.000Z",
@@ -45,7 +45,7 @@
     "type": "Product2",
     "CurrencyCode__c": "USD",
     "Name": "Dell Vostro 3520",
-    "ProductId__c": "P00000000004"
+    "ExternalId__c": "P00000000004"
   },
   {
     "LastModifiedDate": "2026-03-14T13:23:52.000Z",
@@ -57,7 +57,7 @@
     "type": "Product2",
     "CurrencyCode__c": "USD",
     "Name": "Dell XPS 15 9530",
-    "ProductId__c": "P00000000005"
+    "ExternalId__c": "P00000000005"
   },
   {
     "LastModifiedDate": "2026-03-14T13:23:52.000Z",
@@ -69,7 +69,7 @@
     "type": "Product2",
     "CurrencyCode__c": "USD",
     "Name": "HP 15s-fy5007TU",
-    "ProductId__c": "P00000000006"
+    "ExternalId__c": "P00000000006"
   },
   {
     "LastModifiedDate": "2026-03-14T13:23:52.000Z",
@@ -81,7 +81,7 @@
     "type": "Product2",
     "CurrencyCode__c": "USD",
     "Name": "HP Victus 15-fa1352TX",
-    "ProductId__c": "P00000000007"
+    "ExternalId__c": "P00000000007"
   },
   {
     "LastModifiedDate": "2026-03-14T13:23:52.000Z",
@@ -93,7 +93,7 @@
     "type": "Product2",
     "CurrencyCode__c": "USD",
     "Name": "HP Pavilion 15-eg3077TU",
-    "ProductId__c": "P00000000008"
+    "ExternalId__c": "P00000000008"
   },
   {
     "LastModifiedDate": "2026-03-14T13:23:52.000Z",
@@ -105,7 +105,7 @@
     "type": "Product2",
     "CurrencyCode__c": "USD",
     "Name": "HP EliteBook 840 G10",
-    "ProductId__c": "P00000000009"
+    "ExternalId__c": "P00000000009"
   },
   {
     "LastModifiedDate": "2026-03-14T13:23:52.000Z",
@@ -117,6 +117,6 @@
     "type": "Product2",
     "CurrencyCode__c": "USD",
     "Name": "HP OmniBook 5 14",
-    "ProductId__c": "P00000000010"
+    "ExternalId__c": "P00000000010"
   }
 ]
