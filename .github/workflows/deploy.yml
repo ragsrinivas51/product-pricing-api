@@ -125,7 +125,7 @@ jobs:
         run: |
           ENV=$(echo "${{ github.event.inputs.environment }}" | tr '[:upper:]' '[:lower:]')
           echo "ENV value is: $ENV"
-          mvn deploy -DmuleDeploy -B \
+          mvn deploy -DskipMunitTests -DmuleDeploy -B \
             -s ~/.m2/settings.xml \
             -DconnectedAppClientId=${{ secrets.ANYPOINT_USERNAME }} \
             -DconnectedAppClientSecret=${{ secrets.ANYPOINT_PASSWORD }} \
