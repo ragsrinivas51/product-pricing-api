@@ -31,6 +31,15 @@
 					</munit-tools:variables>
 				</munit-tools:then-return>
 			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Salesforce Query" doc:id="a6131494-97a0-4634-a573-ff7635d6e2b9" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Query ExternalId__c" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="c9d5c583-0f81-4ffb-b267-22f7cb1ff5ec" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;readUrl("classpath://examples/queryExternalId.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
 		</munit:behavior>
 		<munit:execution >
 			<munit:set-event doc:name="Set Payload" doc:id="8ca47e74-5c50-4737-be22-ed1084eb90a6" >
