@@ -13,7 +13,6 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 output application/java
 ---
 {   
-    "ProductId__c" : payload.productId,
     "Name" : payload.productName,
     "ProductCode" : payload.productCode,
     "Description" : payload.description,
@@ -21,20 +20,34 @@ output application/java
     "ProductPrice__c" : payload.productPrice as String {format : "0.00"} as Number
 }]]></ee:set-payload>
 			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="inputPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
 		</ee:transform>
 		<salesforce:create doc:name="CreateProduct" doc:id="ae2774d9-097b-49c9-8176-465cf182dad5" config-ref="Salesforce_Config" type="Product2" target="salesforceResponse">
 			<salesforce:records ><![CDATA[#[[payload]]]]></salesforce:records>
 		</salesforce:create>
 		<choice doc:name="" doc:id="0b7b5e0b-88d2-4601-b9b4-5a7c1c59912f" >
 			<when expression="#[isEmpty(vars.salesforceResponse.items[0].statusCode)]">
+				<salesforce:query doc:name="Query ExternalId__c" doc:id="c9d5c583-0f81-4ffb-b267-22f7cb1ff5ec" config-ref="Salesforce_Config" >
+					<salesforce:salesforce-query ><![CDATA[Select ExternalId__c from product2 where Id = ':sfId']]></salesforce:salesforce-query>
+					<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	sfId : vars.salesforceResponse.items[0].id
+}]]]></salesforce:parameters>
+				</salesforce:query>
 				<ee:transform doc:name="responsePayload" doc:id="34b2598e-8396-424a-825c-eec6cf2a5132">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-payload ++ (if(vars.salesforceResponse."successful")
+vars.inputPayload ++ (if(vars.salesforceResponse."successful")
 	 {
-		id : vars.salesforceResponse.items[0].id,
+		productId : payload[0].ExternalId__c,
 		message : "Record Inserted Successfully"
 	}
 else

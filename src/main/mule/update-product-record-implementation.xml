@@ -9,8 +9,9 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 	<sub-flow name="update-product-record-implementationSub_Flow" doc:id="bcacd3bc-158a-4a4a-b2a3-7f1f4f82772b" >
 		<logger level="INFO" doc:name="startLogger" doc:id="4a5e62d7-66b4-45c0-9a55-d1394a0f9fbc" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "Start",&#10;	"timeStamp": now()&#10;}]'/>
 		<set-variable value="#[attributes.uriParams.'productId']" doc:name="productId" doc:id="53c1ae12-6539-4ad5-836a-5aa31d7681b0" variableName="productId"/>
+		<set-variable value="#[payload]" doc:name="inputPayload" doc:id="dbdc004b-1fab-4681-aba6-fdc0c23ce8fe" variableName="inputPayload"/>
 		<salesforce:query doc:name="queryProductObject" doc:id="23093bd9-cc96-4f3b-a41f-9ef83924c0b2" config-ref="Salesforce_Config" target="sfId">
-			<salesforce:salesforce-query ><![CDATA[select Id from product2 where ProductId__c = ':productId']]></salesforce:salesforce-query>
+			<salesforce:salesforce-query ><![CDATA[select Id from product2 where ExternalId__c = ':productId']]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
 {
@@ -26,9 +27,7 @@ output application/java
 ---
 {   
 	"Id" : vars.sfId[0].Id,
-    "ProductId__c" : vars.productId,
     "Name" : payload.productName,
-  //  "ProductCode" : payload.productCode,
     "Description" : payload.description,
     "CurrencyCode__c" : payload.currencyCode,
     "ProductPrice__c" : payload.productPrice as String {format : "0.00"} as Number
@@ -43,7 +42,7 @@ output application/java
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-payload ++ (if(vars.salesforceResponse."successful")
+vars.inputPayload ++ (if(vars.salesforceResponse."successful")
 	 {
 		id : vars.salesforceResponse.items[0].id,
 		message : "Record Inserted Successfully"

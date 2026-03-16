@@ -9,7 +9,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<logger level="INFO" doc:name="startLogger" doc:id="d59a406a-7b0d-4042-aa20-54f30307bff5" message='#[output application/json&#10;---&#10;{&#10;	"transactionId": correlationId,&#10;	"appName": app.name,&#10;	"flowName": flow.name,&#10;	"trace": "Start",&#10;	"timeStamp": now()&#10;}]'/>
 		<set-variable value="#[attributes.uriParams.'productId']" doc:name="productId" doc:id="6bd49862-3fe8-4317-bff9-febea509fa1c" variableName="productId"/>
 		<salesforce:query doc:name="queryProductObject" doc:id="9a6ecb32-3298-4543-afe8-7510c87efa41" config-ref="Salesforce_Config">
-			<salesforce:salesforce-query ><![CDATA[select Id from product2 where ProductId__c = ':productId']]></salesforce:salesforce-query>
+			<salesforce:salesforce-query ><![CDATA[select Id from product2 where ExternalId__c = ':productId']]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
 {
@@ -31,6 +31,7 @@ payload.Id]]]></salesforce:ids>
 output application/json
 ---
 {
+  "statusCode" : 404,
   "message": "ProductId: " ++ (vars.productId) ++ " is not available",
   "errorCode": "RECORD_NOT_FOUND",
   "details": "ProductId: " ++ (vars.productId) ++ " is not available"

@@ -31,7 +31,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 	 <http:listener-config name="product-pricing-api-httpListenerConfig">
         <http:listener-connection host="${http.host}" port="${http.port}" />
     </http:listener-config>
-    <apikit:config name="product-pricing-api-config" api="resource::ae33d189-b1a6-478e-8a64-6a158275d6b7:product-pricing-api:1.0.3:raml:zip:product-pricing-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="product-pricing-api-config" api="resource::ae33d189-b1a6-478e-8a64-6a158275d6b7:product-pricing-api:1.0.4:raml:zip:product-pricing-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
 	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="9c090578-69ad-49a9-94c7-c6efdb59d221" keyGenerationExpression="#[now() as Date]" objectStore="Cache_Object_store"/>
 	<os:object-store name="Cache_Object_store" doc:name="Object store" doc:id="4f81c7ff-92e6-470a-9219-adcaf4f43642" maxEntries="${os.max.entries}" entryTtl="${os.entry.ttl}" entryTtlUnit="DAYS" expirationIntervalUnit="HOURS" expirationInterval="${os.expiration.interval}"/>
 	<configuration-properties doc:name="Configuration properties" doc:id="dc72cbb6-6d15-4a2d-ad42-895e36264818" file="config/properties-${env}.yaml" />
@@ -239,7 +239,7 @@ output application/json
 				</ee:message>
 			</ee:transform>
 			<logger level="INFO" doc:name="logError" doc:id="66c36ba7-27bb-414e-9870-f9b9c1483e41" />
-			<set-variable value="#[500]" doc:name="httpStatus" doc:id="81c6b040-83f9-4b7a-a36f-0b4d94fd5b72" variableName="httpStatus"/>
+			<set-variable value="#[payload.statusCode default  500]" doc:name="httpStatus" doc:id="81c6b040-83f9-4b7a-a36f-0b4d94fd5b72" variableName="httpStatus"/>
 		</on-error-propagate>
 	</error-handler>
 </mule>

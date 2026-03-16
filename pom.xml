@@ -21,6 +21,7 @@
 		<cloudhub2.target>Cloudhub-US-East-2</cloudhub2.target>
 		<cloudhub2.replicas>1</cloudhub2.replicas>
 		<cloudhub2.vcores>0.1</cloudhub2.vcores>
+		<munit.version>3.7.0</munit.version>
 	</properties>
 
 	<build>
@@ -66,6 +67,7 @@
 					<classifier>mule-app</classifier>
 				</configuration>
 			</plugin>
+			
 		</plugins>
 	</build>
 
@@ -97,7 +99,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>product-pricing-api</artifactId>
-			<version>1.0.3</version>
+			<version>1.0.4</version>
 			<classifier>raml</classifier>
 			<type>zip</type>
 		</dependency>
@@ -107,6 +109,7 @@
 			<version>1.2.5</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
+		
 	</dependencies>
 
 	<distributionManagement>
