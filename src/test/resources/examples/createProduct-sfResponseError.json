@@ -1,0 +1,32 @@
+{
+  "id": null,
+  "items": [
+    {
+      "exception": {
+        "localizedMessage": "External ID must be in format P00000000001 (P followed by 11 digits) FIELD_CUSTOM_VALIDATION_EXCEPTION",
+        "cause": null,
+        "message": "External ID must be in format P00000000001 (P followed by 11 digits) FIELD_CUSTOM_VALIDATION_EXCEPTION"
+        
+      },
+      "message": "External ID must be in format P00000000001 (P followed by 11 digits)",
+      "payload": {
+        "success": false,
+        "id": null,
+        "errors": [
+          {
+            "duplicateResult": null,
+            "message": "External ID must be in format P00000000001 (P followed by 11 digits)",
+            "fields": [
+              "ExternalId"
+            ],
+            "statusCode": "FIELD_CUSTOM_VALIDATION_EXCEPTION"
+          }
+        ]
+      },
+      "id": null,
+      "statusCode": "FIELD_CUSTOM_VALIDATION_EXCEPTION",
+      "successful": false
+    }
+  ],
+  "successful": false
+}

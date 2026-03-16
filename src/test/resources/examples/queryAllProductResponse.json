@@ -1,0 +1,122 @@
+[
+  {
+    "LastModifiedDate": "2026-03-14T17:26:39.000Z",
+    "ProductPrice__c": "17500.0",
+    "Description": "High-performance laptop for professional use",
+    "ProductCode": "XYZ12345",
+    "CreatedDate": "2026-03-13T18:42:59.000Z",
+    "Id": "01tdL00000agYgTQAU",
+    "type": "Product2",
+    "CurrencyCode__c": "INR",
+    "Name": "Apple 2025 MacBook Air (13-inch, Apple M4 chip with 10-core CPU and 8-core GPU, 16GB Unified Memory, 256GB) - Silver",
+    "ProductId__c": "P00000000001"
+  },
+  {
+    "LastModifiedDate": "2026-03-14T13:23:52.000Z",
+    "ProductPrice__c": "581.93",
+    "Description": "Dell Inspiron 15 Core i5 13th Gen/16GB/512GB SSD/Win11",
+    "ProductCode": "INS353",
+    "CreatedDate": "2026-03-14T13:23:52.000Z",
+    "Id": "01tdL00000aj1RRQAY",
+    "type": "Product2",
+    "CurrencyCode__c": "USD",
+    "Name": "Dell Inspiron 15 3530",
+    "ProductId__c": "P00000000002"
+  },
+  {
+    "LastModifiedDate": "2026-03-14T13:23:52.000Z",
+    "ProductPrice__c": "640.24",
+    "Description": "Dell Inspiron 14 Core i5 13th Gen/16GB/512GB SSD/Win11",
+    "ProductCode": "INS544",
+    "CreatedDate": "2026-03-14T13:23:52.000Z",
+    "Id": "01tdL00000aj1RSQAY",
+    "type": "Product2",
+    "CurrencyCode__c": "USD",
+    "Name": "Dell Inspiron 14 5440",
+    "ProductId__c": "P00000000003"
+  },
+  {
+    "LastModifiedDate": "2026-03-14T13:23:52.000Z",
+    "ProductPrice__c": "540.87",
+    "Description": "Dell Vostro 15 Core i5 12th Gen/8GB/512GB SSD/Win11 Pro",
+    "ProductCode": "VOS352",
+    "CreatedDate": "2026-03-14T13:23:52.000Z",
+    "Id": "01tdL00000aj1RTQAY",
+    "type": "Product2",
+    "CurrencyCode__c": "USD",
+    "Name": "Dell Vostro 3520",
+    "ProductId__c": "P00000000004"
+  },
+  {
+    "LastModifiedDate": "2026-03-14T13:23:52.000Z",
+    "ProductPrice__c": "1621.69",
+    "Description": "Dell XPS 15 Core i7 13th Gen/16GB/512GB SSD/Win11 4K OLED",
+    "ProductCode": "XPS953",
+    "CreatedDate": "2026-03-14T13:23:52.000Z",
+    "Id": "01tdL00000aj1RUQAY",
+    "type": "Product2",
+    "CurrencyCode__c": "USD",
+    "Name": "Dell XPS 15 9530",
+    "ProductId__c": "P00000000005"
+  },
+  {
+    "LastModifiedDate": "2026-03-14T13:23:52.000Z",
+    "ProductPrice__c": "424.45",
+    "Description": "HP 15 Intel Core i3 12th Gen/8GB/512GB SSD/Win11 FHD",
+    "ProductCode": "HP15FY",
+    "CreatedDate": "2026-03-14T13:23:52.000Z",
+    "Id": "01tdL00000aj1RVQAY",
+    "type": "Product2",
+    "CurrencyCode__c": "USD",
+    "Name": "HP 15s-fy5007TU",
+    "ProductId__c": "P00000000006"
+  },
+  {
+    "LastModifiedDate": "2026-03-14T13:23:52.000Z",
+    "ProductPrice__c": "817.8",
+    "Description": "HP Victus 15 Core i5 13th Gen/16GB/512GB SSD/GTX 1650/Win11",
+    "ProductCode": "VIC15F",
+    "CreatedDate": "2026-03-14T13:23:52.000Z",
+    "Id": "01tdL00000aj1RWQAY",
+    "type": "Product2",
+    "CurrencyCode__c": "USD",
+    "Name": "HP Victus 15-fa1352TX",
+    "ProductId__c": "P00000000007"
+  },
+  {
+    "LastModifiedDate": "2026-03-14T13:23:52.000Z",
+    "ProductPrice__c": "681.68",
+    "Description": "HP Pavilion 15 Core i5 13th Gen/16GB/512GB SSD/Win11",
+    "ProductCode": "PAV15E",
+    "CreatedDate": "2026-03-14T13:23:52.000Z",
+    "Id": "01tdL00000aj1RXQAY",
+    "type": "Product2",
+    "CurrencyCode__c": "USD",
+    "Name": "HP Pavilion 15-eg3077TU",
+    "ProductId__c": "P00000000008"
+  },
+  {
+    "LastModifiedDate": "2026-03-14T13:23:52.000Z",
+    "ProductPrice__c": "1093.85",
+    "Description": "HP EliteBook 840 Core i5 13th Gen/16GB/512GB SSD/Win11 Pro",
+    "ProductCode": "EB840G",
+    "CreatedDate": "2026-03-14T13:23:52.000Z",
+    "Id": "01tdL00000aj1RYQAY",
+    "type": "Product2",
+    "CurrencyCode__c": "USD",
+    "Name": "HP EliteBook 840 G10",
+    "ProductId__c": "P00000000009"
+  },
+  {
+    "LastModifiedDate": "2026-03-14T13:23:52.000Z",
+    "ProductPrice__c": "630.69",
+    "Description": "HP OmniBook 5 Core i5 13th Gen/16GB/512GB SSD/Win11",
+    "ProductCode": "OMN514",
+    "CreatedDate": "2026-03-14T13:23:52.000Z",
+    "Id": "01tdL00000aj1RZQAY",
+    "type": "Product2",
+    "CurrencyCode__c": "USD",
+    "Name": "HP OmniBook 5 14",
+    "ProductId__c": "P00000000010"
+  }
+]

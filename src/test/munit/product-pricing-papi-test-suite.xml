@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="product-pricing-papi-test-suite.xml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="6db4d1fa-5960-4ad4-b808-12f0a15d2561" file="config\properties-test.yaml" />
+	<global-property doc:name="Global Property" doc:id="2c080fdc-3f9a-4605-9be9-9507f0ae692e" name="env" value="test" />
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest" doc:id="0a259765-6c56-4af1-a4e0-0072c0fc40c1" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2a25cc21-b584-49e1-9c97-16779a72fdad" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="post:\products:application\json:product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fc37dde5-cb6e-4340-9c57-d16387799417" processor="salesforce:create">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="CreateProduct" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="ae2774d9-097b-49c9-8176-465cf182dad5" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="salesforceResponse" value='#[output json  ---  readUrl("classpath://examples/createProduct-sfResponse.json","application/json")]' mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="8ca47e74-5c50-4737-be22-ed1084eb90a6" >
+				<munit:payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;readUrl("classpath://examples/createProduct-request.json","application/json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="9b500402-c7a1-4c30-9132-dcfff8bb4f9e" name="product-pricing-api-main"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="87b20ccb-3f2f-4d55-b52e-472c082f87a9" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainError" doc:id="030811d5-6abe-48d9-925f-e782e7b61afd" description="Test" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="46a039ca-a836-4d77-b7cf-11b78f342209" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="post:\products:application\json:product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b5a86b6b-4cc8-43f4-9601-91e4f44bfca9" processor="salesforce:create">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="CreateProduct" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="ae2774d9-097b-49c9-8176-465cf182dad5" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="salesforceResponse" value='#[output json  ---  readUrl("classpath://examples/createProduct-sfResponseError.json","application/json")]' mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="6cc55665-d52d-4800-80cb-17a92bd861fc" >
+				<munit:payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;readUrl("classpath://examples/createProduct-request.json","application/json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="899ff527-35a3-4c5d-b0de-1f86a3c3d949" name="product-pricing-api-main"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="1c597e35-0cef-4eee-a180-5976e152bd96" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	
+</munit:test>
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest-deleteError" doc:id="2fcb397d-ece3-42a3-a265-93525b914415" description="Test" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fc7a2391-c1e4-45eb-93bf-49b8d3b6f80b" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="delete:\products\(productId):product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a562cfb9-ce18-4f5f-b293-4f0158fc0f2f" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="queryProductObject" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="9a6ecb32-3298-4543-afe8-7510c87efa41" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output json  ---  []]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="1928e635-09f4-48bc-9bfe-8857cb122f79" >
+				<munit:attributes value='#[{"uriParams":{"productId":"P00000000001"}}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="32e92f41-bd51-4a75-81ec-11bfbc7213ee" name="product-pricing-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest-delete" doc:id="88f6fcef-b244-4548-af11-7f18e85b930b" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="62602d04-c228-4a74-9bd6-f3f1d82023d6" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="delete:\products\(productId):product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="09cee2b1-caa2-4baf-aa1f-b2634a370443" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="queryProductObject" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="9a6ecb32-3298-4543-afe8-7510c87efa41" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/queryProductResponse.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="bd6d9c6f-1cde-48f7-8fbd-91a375335dff" processor="salesforce:delete">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="DeleteProductRecord" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="1292a423-4e21-4f74-b2d6-227d4057ad97" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output json  ---  []]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ca6928f1-1890-4af8-a296-2f6ddfff3ea7" >
+				<munit:attributes value='#[{"uriParams":{"productId":"P00000000001"}}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="aaef6f0e-10ab-4066-8923-7d349786864a" name="product-pricing-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest-getAllProducts_NoRecords" doc:id="40cd7843-6fa2-4365-8820-d6ae3320ccf6" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="91a82fe7-ea2b-4205-9a77-d73b42e18fa5" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="get:\products:product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f6d7e670-d666-40a7-a666-547ca4402bc8" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Get total record Count" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="6d9862f7-8955-4165-bce2-b3bb4be41c78" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/queryProductCount_0.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="956de2ee-5579-4810-ad75-54f985ce6a40" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Call currencyConversionAPI" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="fb6656b5-3332-412f-a3de-5f46018b72d8" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/currencyExchangeResponse.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="333c979d-f44b-4fb1-be5f-a5a851f33bbd" >
+				<munit:attributes value='#[{"queryParams":{"currencyCode":"USD","offset":20,"limit":2}}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="137088a9-9048-49bb-8cc7-9350084e675c" name="product-pricing-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest-getAllProducts" doc:id="ff2624e4-892f-40a4-8512-c150a9d01269" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5ea50fab-c977-42fa-bde4-948f2f273989" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="get:\products:product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="7a46c4ed-d796-4941-ac5c-f690a965cabd" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Get total record Count" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="6d9862f7-8955-4165-bce2-b3bb4be41c78" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/queryProductCount.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="7312e9af-89c8-403d-8300-8c491655069d" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Call currencyConversionAPI" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="fb6656b5-3332-412f-a3de-5f46018b72d8" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/currencyExchangeResponse.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="81204437-844b-4c6b-9dcb-6438e37d362a" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="queryProductObject" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="1164e52d-eba8-4feb-ae81-f3e6ac4980a4" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/queryAllProductResponse.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="94adaa62-34fd-473b-9743-82750ba9b1ea" >
+				<munit:attributes value='#[{"queryParams":{"currencyCode":"USD","offset":20,"limit":2}}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="e3cd3d19-09b2-440b-8829-124a901c364e" name="product-pricing-api-main"/>
+		</munit:execution>
+	</munit:test>
+	
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest-getProductByID" doc:id="8615ecac-8cff-4cfd-8edc-e39e224e0e19" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="10de90ac-e2cb-419b-901e-7c186da11f47" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="get:\products\(productId):application\json:product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ca881fb4-ed50-4cf4-9e26-4ca804fc36b8" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Get total record Count" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="6d9862f7-8955-4165-bce2-b3bb4be41c78" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/queryProductByIdResponse.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="119221c7-c513-45dd-b5d9-947d9b164a4e" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Call currencyConversionAPI" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="fb6656b5-3332-412f-a3de-5f46018b72d8" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/currencyExchangeResponse.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="e596e97f-938b-436e-8fb0-1a64d043d175" >
+				<munit:attributes value='#[output json --- {"uriParams":{"productId":"P00000000001"},"queryParams" : {"currencyCode": "USD"}}]' mediaType="application/json" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="89e3fb10-be33-433f-8cc8-2efc4465f997" name="product-pricing-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest-getProductByID_NoRecord" doc:id="e80f9f57-e829-49ff-9122-d25a58883f80" description="Test" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b06d1a96-1329-4e53-bf5d-37015a445cc0" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="get:\products\(productId):application\json:product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="3b6b84b5-b16d-415a-965f-1c40f46d23f6" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Get total record Count" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="6d9862f7-8955-4165-bce2-b3bb4be41c78" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/queryProductCount_0.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="18eaa7ce-4827-4638-a2cc-3fbb5fb7be8e" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Call currencyConversionAPI" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="fb6656b5-3332-412f-a3de-5f46018b72d8" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/currencyExchangeResponse.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="8ee36ea9-15e0-40f6-ae34-8aab1154501b" >
+				<munit:attributes value='#[output json --- {"uriParams":{"productId":"P01000000001"},"queryParams" : {"currencyCode": "USD"}}]' mediaType="application/json" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="570843a3-ff27-4788-a16c-1c3d7398473d" name="product-pricing-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest-updateProductByIDSucess" doc:id="ee1faf95-b7c8-41b2-99a1-7161dd383f4a" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ffa5ab11-28df-41f9-a45a-0f1e95546a42" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="patch:\products\(productId):application\json:product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="875b3b01-500b-41e9-acc8-980a2a3c3eb9" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="queryProductObject" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="23093bd9-cc96-4f3b-a41f-9ef83924c0b2" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="sfId" value='#[output json  ---  readUrl("classpath://examples/queryProductResponse.json","application/json")]' mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="aa2849df-d5b1-41c7-9937-a407bf651969" processor="salesforce:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="updateProductRecord" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="50108e69-caa7-4187-98e6-fa1bccfcfdd6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="salesforceResponse" value='#[output json  ---  readUrl("classpath://examples/createProduct-sfResponse.json","application/json")]' mediaType="application/json" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		
+</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="f98731f1-a8fd-4171-85ed-03e642951334" >
+				<munit:payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;readUrl("classpath://examples/updateProduct-request.json","application/json")]' mediaType="application/json" />
+				<munit:attributes value='#[output json --- {"uriParams":{"productId":"P00000000001"}}]' mediaType="application/json" />
+
+			
+</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="4ab0cf3a-1938-43fa-86df-7d112be0e5be" name="product-pricing-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest-updateProductByID_NoRecord" doc:id="614b0a17-dd1d-4943-97bb-528c124e723b" description="Test" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="d4722c3d-2712-4565-a195-78c45e3043e1" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="patch:\products\(productId):application\json:product-pricing-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ebd2c517-b72b-43ac-b958-1e9008b76def" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="queryProductObject" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="23093bd9-cc96-4f3b-a41f-9ef83924c0b2" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output json  ---  readUrl("classpath://examples/queryProductCount_0.json","application/json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="d5f05d8c-8c6b-4c58-bbc9-8756ffdca59d" >
+				<munit:payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;readUrl("classpath://examples/updateProduct-request.json","application/json")]' mediaType="application/json" />
+				<munit:attributes value='#[output json --- {"uriParams":{"productId":"P00000000001"}}]' mediaType="application/json" />
+
+			
+</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="ec6108a3-3442-4a9f-af9b-a22cdcf6e179" name="product-pricing-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="product-pricing-papi-test-suite-product-pricing-api-mainTest1" doc:id="84ad9f44-66eb-4f5c-b802-1a4630959347" description="Test" expectedErrorType="APIKIT:BAD_REQUEST">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f1e32976-b555-4086-ac3d-f54dc75ac558" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product-pricing-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="f6b6426c-e9cb-47b9-9ae5-adeed2b6b240" >
+				<munit:attributes value='#[output json --- {"uriParams":{"productId":"P00000000001"},"queryParams" : {"currencyCode": "USD"}}]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to product-pricing-api-main" doc:id="1782367f-8f4b-4bef-8588-fbedc3150ddc" name="product-pricing-api-main"/>
+		</munit:execution>
+	</munit:test>
+</mule>

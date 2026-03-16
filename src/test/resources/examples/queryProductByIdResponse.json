@@ -1,0 +1,14 @@
+[
+  {
+    "LastModifiedDate": "2026-03-14T17:26:39.000Z",
+    "ProductPrice__c": "17500.0",
+    "Description": "High-performance laptop for professional use",
+    "ProductCode": "XYZ12345",
+    "CreatedDate": "2026-03-13T18:42:59.000Z",
+    "Id": "01tdL00000agYgTQAU",
+    "type": "Product2",
+    "CurrencyCode__c": "INR",
+    "Name": "Apple 2025 MacBook Air (13-inch, Apple M4 chip with 10-core CPU and 8-core GPU, 16GB Unified Memory, 256GB) - Silver",
+    "ProductId__c": "P00000000001"
+  }
+]
