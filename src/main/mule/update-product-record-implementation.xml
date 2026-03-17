@@ -65,7 +65,7 @@ output application/json
 {
 	"statusCode" : 404,
   "message": "ProductId: " ++ (vars.productId) ++ " is not available",
-  "errorCode": "RECORD_NOT_FOUND",
+  "error": "RECORD_NOT_FOUND",
   "details": "ProductId: " ++ (vars.productId) ++ " is not available"
 }]]></ee:set-payload>
 					</ee:message>

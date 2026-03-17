@@ -231,14 +231,14 @@ output application/json
 {
   "statusCode": payload.statusCode,
   "message": payload.message,
-  "error": payload."errorCode",
+  "error": payload."error",
   "timestamp": now(),
   "correlationId": correlationId,
   "details": payload.details
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-			<logger level="INFO" doc:name="logError" doc:id="66c36ba7-27bb-414e-9870-f9b9c1483e41" />
+			<logger level="INFO" doc:name="logError" doc:id="66c36ba7-27bb-414e-9870-f9b9c1483e41" message="#[payload]"/>
 			<set-variable value="#[payload.statusCode default  500]" doc:name="httpStatus" doc:id="81c6b040-83f9-4b7a-a36f-0b4d94fd5b72" variableName="httpStatus"/>
 		</on-error-propagate>
 	</error-handler>
