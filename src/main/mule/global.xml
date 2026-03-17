@@ -231,7 +231,7 @@ output application/json
 {
   "statusCode": payload.statusCode,
   "message": payload.message,
-  "error": payload.errorCode,
+  "error": payload."errorCode",
   "timestamp": now(),
   "correlationId": correlationId,
   "details": payload.details
